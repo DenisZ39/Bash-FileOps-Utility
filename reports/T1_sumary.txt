@@ -1,0 +1,8 @@
+Timp start: Tue Mar  3 10:39:31 PM EET 2026 (Timestamp: 1772570371)
+Timp end: Tue Mar  3 10:39:31 PM EET 2026 (Timestamp: 1772570371)
+Timp de rulare: 0 secunde
+Cai create/verificate
+reports/fs
+reports/process
+reports/proc
+reports/pipeline

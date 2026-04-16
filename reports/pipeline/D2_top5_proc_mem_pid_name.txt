@@ -1,0 +1,6 @@
+   3101 spotify
+   3068 Discord
+   4082 brave
+   3545 spotify
+   3832 brave
+   1988 gnome-shell

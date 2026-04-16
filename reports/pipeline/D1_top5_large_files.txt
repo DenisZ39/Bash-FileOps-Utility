@@ -1,0 +1,6 @@
+93444	./reports/process/B2_pstree.txt
+6576	./reports/process/B1_top_mem.txt
+5186	./doc/T1_comenzi.md
+4898	./.git/hooks/pre-rebase.sample
+4726	./.git/hooks/fsmonitor-watchman.sample
+4401	./.git/objects/pack/pack-04b9b8b4e6c30eaf1f3c5676cf1c746933b32e9e.pack

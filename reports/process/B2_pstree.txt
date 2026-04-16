@@ -1,0 +1,1008 @@
+systemd(1)-+-ModemManager(1536)-+-{ModemManager}(1546)
+           |                    |-{ModemManager}(1547)
+           |                    `-{ModemManager}(1549)
+           |-NetworkManager(1436)-+-{NetworkManager}(1473)
+           |                      |-{NetworkManager}(1475)
+           |                      `-{NetworkManager}(1477)
+           |-accounts-daemon(1385)-+-{accounts-daemon}(1467)
+           |                       |-{accounts-daemon}(1468)
+           |                       `-{accounts-daemon}(1470)
+           |-avahi-daemon(1358)---avahi-daemon(1431)
+           |-bluetoothd(1441)
+           |-colord(2062)-+-{colord}(2071)
+           |              |-{colord}(2072)
+           |              `-{colord}(2074)
+           |-cron(1386)
+           |-cups-browsed(2749)-+-{cups-browsed}(2778)
+           |                    |-{cups-browsed}(2779)
+           |                    `-{cups-browsed}(2780)
+           |-cupsd(1739)
+           |-dbus-daemon(1360)
+           |-fwupd(6168)-+-{fwupd}(6169)
+           |             |-{fwupd}(6170)
+           |             |-{fwupd}(6171)
+           |             |-{fwupd}(6172)
+           |             `-{fwupd}(6174)
+           |-gdm3(1765)-+-gdm-session-wor(1774)-+-gdm-wayland-ses(1827)-+-gnome-session-b(1832)-+-{gnome-session-b}(1909)
+           |            |                       |                       |                       |-{gnome-session-b}(1910)
+           |            |                       |                       |                       `-{gnome-session-b}(1911)
+           |            |                       |                       |-{gdm-wayland-ses}(1828)
+           |            |                       |                       |-{gdm-wayland-ses}(1829)
+           |            |                       |                       `-{gdm-wayland-ses}(1831)
+           |            |                       |-{gdm-session-wor}(1775)
+           |            |                       |-{gdm-session-wor}(1776)
+           |            |                       `-{gdm-session-wor}(1778)
+           |            |-{gdm3}(1767)
+           |            |-{gdm3}(1768)
+           |            `-{gdm3}(1769)
+           |-gnome-remote-de(1364)-+-{gnome-remote-de}(1478)
+           |                       |-{gnome-remote-de}(1483)
+           |                       `-{gnome-remote-de}(1484)
+           |-kerneloops(2755)
+           |-kerneloops(2759)
+           |-polkitd(1369)-+-{polkitd}(1512)
+           |               |-{polkitd}(1513)
+           |               `-{polkitd}(1516)
+           |-rsyslogd(1476)-+-{rsyslogd}(1543)
+           |                |-{rsyslogd}(1544)
+           |                `-{rsyslogd}(1545)
+           |-rtkit-daemon(1817)-+-{rtkit-daemon}(1825)
+           |                    `-{rtkit-daemon}(1826)
+           |-snapd(1380)-+-{snapd}(1418)
+           |             |-{snapd}(1419)
+           |             |-{snapd}(1420)
+           |             |-{snapd}(1421)
+           |             |-{snapd}(1422)
+           |             |-{snapd}(1550)
+           |             |-{snapd}(1551)
+           |             |-{snapd}(1555)
+           |             |-{snapd}(1557)
+           |             |-{snapd}(1614)
+           |             |-{snapd}(1615)
+           |             |-{snapd}(1624)
+           |             |-{snapd}(1627)
+           |             |-{snapd}(1628)
+           |             |-{snapd}(1629)
+           |             |-{snapd}(1643)
+           |             |-{snapd}(1667)
+           |             |-{snapd}(1712)
+           |             |-{snapd}(1713)
+           |             |-{snapd}(1714)
+           |             `-{snapd}(1772)
+           |-switcheroo-cont(1391)-+-{switcheroo-cont}(1432)
+           |                       |-{switcheroo-cont}(1433)
+           |                       `-{switcheroo-cont}(1440)
+           |-systemd(1782)-+-(sd-pam)(1783)
+           |               |-at-spi2-registr(2061)-+-{at-spi2-registr}(2063)
+           |               |                       |-{at-spi2-registr}(2064)
+           |               |                       `-{at-spi2-registr}(2065)
+           |               |-chrome_crashpad(2903)-+-{chrome_crashpad}(2904)
+           |               |                       `-{chrome_crashpad}(2905)
+           |               |-chrome_crashpad(3834)-+-{chrome_crashpad}(3838)
+           |               |                       `-{chrome_crashpad}(3839)
+           |               |-chrome_crashpad(3836)---{chrome_crashpad}(3837)
+           |               |-dbus-daemon(1807)
+           |               |-dconf-service(2436)-+-{dconf-service}(2454)
+           |               |                     |-{dconf-service}(2455)
+           |               |                     `-{dconf-service}(2457)
+           |               |-evolution-addre(2404)-+-{evolution-addre}(2411)
+           |               |                       |-{evolution-addre}(2412)
+           |               |                       |-{evolution-addre}(2413)
+           |               |                       |-{evolution-addre}(2415)
+           |               |                       |-{evolution-addre}(2416)
+           |               |                       `-{evolution-addre}(2418)
+           |               |-evolution-calen(2343)-+-{evolution-calen}(2373)
+           |               |                       |-{evolution-calen}(2374)
+           |               |                       |-{evolution-calen}(2375)
+           |               |                       |-{evolution-calen}(2390)
+           |               |                       |-{evolution-calen}(2391)
+           |               |                       |-{evolution-calen}(2401)
+           |               |                       |-{evolution-calen}(2402)
+           |               |                       |-{evolution-calen}(2406)
+           |               |                       `-{evolution-calen}(2522)
+           |               |-evolution-sourc(2115)-+-{evolution-sourc}(2119)
+           |               |                       |-{evolution-sourc}(2120)
+           |               |                       |-{evolution-sourc}(2121)
+           |               |                       `-{evolution-sourc}(2123)
+           |               |-gcr-ssh-agent(1917)-+-{gcr-ssh-agent}(1924)
+           |               |                     `-{gcr-ssh-agent}(1925)
+           |               |-gjs(2127)-+-{gjs}(2131)
+           |               |           |-{gjs}(2132)
+           |               |           |-{gjs}(2134)
+           |               |           |-{gjs}(2137)
+           |               |           |-{gjs}(2138)
+           |               |           |-{gjs}(2139)
+           |               |           |-{gjs}(2140)
+           |               |           |-{gjs}(2141)
+           |               |           |-{gjs}(2142)
+           |               |           |-{gjs}(2144)
+           |               |           `-{gjs}(2145)
+           |               |-gjs(2533)-+-{gjs}(2537)
+           |               |           |-{gjs}(2538)
+           |               |           |-{gjs}(2539)
+           |               |           |-{gjs}(2540)
+           |               |           |-{gjs}(2541)
+           |               |           |-{gjs}(2542)
+           |               |           |-{gjs}(2543)
+           |               |           |-{gjs}(2544)
+           |               |           |-{gjs}(2545)
+           |               |           |-{gjs}(2546)
+           |               |           `-{gjs}(2547)
+           |               |-gnome-keyring-d(1798)-+-ssh-agent(5741)
+           |               |                       |-{gnome-keyring-d}(1804)
+           |               |                       |-{gnome-keyring-d}(1805)
+           |               |                       |-{gnome-keyring-d}(1808)
+           |               |                       `-{gnome-keyring-d}(1812)
+           |               |-gnome-session-b(1945)-+-at-spi-bus-laun(1987)-+-dbus-daemon(2001)
+           |               |                       |                       |-{at-spi-bus-laun}(1995)
+           |               |                       |                       |-{at-spi-bus-laun}(1996)
+           |               |                       |                       |-{at-spi-bus-laun}(1997)
+           |               |                       |                       `-{at-spi-bus-laun}(1999)
+           |               |                       |-evolution-alarm(2274)-+-{evolution-alarm}(2361)
+           |               |                       |                       |-{evolution-alarm}(2362)
+           |               |                       |                       |-{evolution-alarm}(2366)
+           |               |                       |                       |-{evolution-alarm}(2367)
+           |               |                       |                       |-{evolution-alarm}(2509)
+           |               |                       |                       |-{evolution-alarm}(2515)
+           |               |                       |                       `-{evolution-alarm}(2517)
+           |               |                       |-gsd-disk-utilit(2235)-+-{gsd-disk-utilit}(2261)
+           |               |                       |                       |-{gsd-disk-utilit}(2263)
+           |               |                       |                       `-{gsd-disk-utilit}(2281)
+           |               |                       |-update-notifier(4415)-+-{update-notifier}(4428)
+           |               |                       |                       |-{update-notifier}(4429)
+           |               |                       |                       |-{update-notifier}(4431)
+           |               |                       |                       |-{update-notifier}(4432)
+           |               |                       |                       `-{update-notifier}(4454)
+           |               |                       |-{gnome-session-b}(1952)
+           |               |                       |-{gnome-session-b}(1953)
+           |               |                       |-{gnome-session-b}(1955)
+           |               |                       `-{gnome-session-b}(1965)
+           |               |-gnome-session-c(1920)---{gnome-session-c}(1926)
+           |               |-gnome-shell(1988)-+-Discord(2820)-+-Discord(2887)---Discord(2995)-+-{Discord}(3028)
+           |               |                   |               |                               |-{Discord}(3029)
+           |               |                   |               |                               |-{Discord}(3030)
+           |               |                   |               |                               |-{Discord}(3031)
+           |               |                   |               |                               |-{Discord}(3033)
+           |               |                   |               |                               |-{Discord}(3034)
+           |               |                   |               |                               |-{Discord}(3035)
+           |               |                   |               |                               |-{Discord}(3036)
+           |               |                   |               |                               |-{Discord}(3037)
+           |               |                   |               |                               |-{Discord}(3038)
+           |               |                   |               |                               |-{Discord}(3039)
+           |               |                   |               |                               |-{Discord}(3040)
+           |               |                   |               |                               |-{Discord}(3041)
+           |               |                   |               |                               |-{Discord}(3042)
+           |               |                   |               |                               |-{Discord}(3043)
+           |               |                   |               |                               |-{Discord}(3044)
+           |               |                   |               |                               |-{Discord}(3045)
+           |               |                   |               |                               |-{Discord}(3046)
+           |               |                   |               |                               |-{Discord}(3047)
+           |               |                   |               |                               |-{Discord}(3048)
+           |               |                   |               |                               |-{Discord}(3049)
+           |               |                   |               |                               |-{Discord}(3050)
+           |               |                   |               |                               |-{Discord}(3051)
+           |               |                   |               |                               |-{Discord}(3052)
+           |               |                   |               |                               `-{Discord}(3056)
+           |               |                   |               |-Discord(2888)
+           |               |                   |               |-Discord(3001)-+-{Discord}(3005)
+           |               |                   |               |               |-{Discord}(3006)
+           |               |                   |               |               |-{Discord}(3007)
+           |               |                   |               |               |-{Discord}(3008)
+           |               |                   |               |               |-{Discord}(3009)
+           |               |                   |               |               |-{Discord}(3010)
+           |               |                   |               |               |-{Discord}(3011)
+           |               |                   |               |               |-{Discord}(3020)
+           |               |                   |               |               |-{Discord}(3021)
+           |               |                   |               |               |-{Discord}(3092)
+           |               |                   |               |               |-{Discord}(3093)
+           |               |                   |               |               |-{Discord}(3094)
+           |               |                   |               |               |-{Discord}(3095)
+           |               |                   |               |               |-{Discord}(3096)
+           |               |                   |               |               |-{Discord}(3097)
+           |               |                   |               |               |-{Discord}(3098)
+           |               |                   |               |               |-{Discord}(3099)
+           |               |                   |               |               `-{Discord}(3100)
+           |               |                   |               |-Discord(3068)-+-{Discord}(3069)
+           |               |                   |               |               |-{Discord}(3070)
+           |               |                   |               |               |-{Discord}(3071)
+           |               |                   |               |               |-{Discord}(3072)
+           |               |                   |               |               |-{Discord}(3073)
+           |               |                   |               |               |-{Discord}(3074)
+           |               |                   |               |               |-{Discord}(3075)
+           |               |                   |               |               |-{Discord}(3077)
+           |               |                   |               |               |-{Discord}(3078)
+           |               |                   |               |               |-{Discord}(3079)
+           |               |                   |               |               |-{Discord}(3080)
+           |               |                   |               |               |-{Discord}(3081)
+           |               |                   |               |               |-{Discord}(3083)
+           |               |                   |               |               |-{Discord}(3084)
+           |               |                   |               |               |-{Discord}(3085)
+           |               |                   |               |               |-{Discord}(3086)
+           |               |                   |               |               |-{Discord}(3087)
+           |               |                   |               |               |-{Discord}(3089)
+           |               |                   |               |               |-{Discord}(3090)
+           |               |                   |               |               |-{Discord}(3091)
+           |               |                   |               |               |-{Discord}(3144)
+           |               |                   |               |               |-{Discord}(3145)
+           |               |                   |               |               |-{Discord}(3146)
+           |               |                   |               |               |-{Discord}(3147)
+           |               |                   |               |               |-{Discord}(3148)
+           |               |                   |               |               |-{Discord}(3149)
+           |               |                   |               |               |-{Discord}(3150)
+           |               |                   |               |               |-{Discord}(3151)
+           |               |                   |               |               |-{Discord}(3152)
+           |               |                   |               |               |-{Discord}(3153)
+           |               |                   |               |               |-{Discord}(3154)
+           |               |                   |               |               |-{Discord}(3155)
+           |               |                   |               |               |-{Discord}(3156)
+           |               |                   |               |               |-{Discord}(3157)
+           |               |                   |               |               |-{Discord}(3158)
+           |               |                   |               |               |-{Discord}(3159)
+           |               |                   |               |               |-{Discord}(3205)
+           |               |                   |               |               |-{Discord}(3206)
+           |               |                   |               |               |-{Discord}(3207)
+           |               |                   |               |               |-{Discord}(3217)
+           |               |                   |               |               |-{Discord}(3218)
+           |               |                   |               |               |-{Discord}(3219)
+           |               |                   |               |               |-{Discord}(3220)
+           |               |                   |               |               |-{Discord}(3221)
+           |               |                   |               |               |-{Discord}(3552)
+           |               |                   |               |               |-{Discord}(3553)
+           |               |                   |               |               |-{Discord}(3573)
+           |               |                   |               |               `-{Discord}(3580)
+           |               |                   |               |-Discord(3162)-+-{Discord}(3168)
+           |               |                   |               |               |-{Discord}(3169)
+           |               |                   |               |               |-{Discord}(3170)
+           |               |                   |               |               |-{Discord}(3171)
+           |               |                   |               |               `-{Discord}(3172)
+           |               |                   |               |-{Discord}(2886)
+           |               |                   |               |-{Discord}(2889)
+           |               |                   |               |-{Discord}(2890)
+           |               |                   |               |-{Discord}(2891)
+           |               |                   |               |-{Discord}(2892)
+           |               |                   |               |-{Discord}(2893)
+           |               |                   |               |-{Discord}(2894)
+           |               |                   |               |-{Discord}(2895)
+           |               |                   |               |-{Discord}(2896)
+           |               |                   |               |-{Discord}(2897)
+           |               |                   |               |-{Discord}(2898)
+           |               |                   |               |-{Discord}(2907)
+           |               |                   |               |-{Discord}(2908)
+           |               |                   |               |-{Discord}(2909)
+           |               |                   |               |-{Discord}(2910)
+           |               |                   |               |-{Discord}(2970)
+           |               |                   |               |-{Discord}(2971)
+           |               |                   |               |-{Discord}(2972)
+           |               |                   |               |-{Discord}(2973)
+           |               |                   |               |-{Discord}(2974)
+           |               |                   |               |-{Discord}(2975)
+           |               |                   |               |-{Discord}(2976)
+           |               |                   |               |-{Discord}(2977)
+           |               |                   |               |-{Discord}(2978)
+           |               |                   |               |-{Discord}(2979)
+           |               |                   |               |-{Discord}(2982)
+           |               |                   |               |-{Discord}(2994)
+           |               |                   |               |-{Discord}(2996)
+           |               |                   |               |-{Discord}(2998)
+           |               |                   |               |-{Discord}(3004)
+           |               |                   |               |-{Discord}(3018)
+           |               |                   |               |-{Discord}(3160)
+           |               |                   |               |-{Discord}(3161)
+           |               |                   |               |-{Discord}(3444)
+           |               |                   |               |-{Discord}(3445)
+           |               |                   |               |-{Discord}(3455)
+           |               |                   |               |-{Discord}(3454)
+           |               |                   |               |-{Discord}(3748)
+           |               |                   |               |-{Discord}(3749)
+           |               |                   |               |-{Discord}(3750)
+           |               |                   |               |-{Discord}(3751)
+           |               |                   |               |-{Discord}(3752)
+           |               |                   |               |-{Discord}(3753)
+           |               |                   |               `-{Discord}(3754)
+           |               |                   |-Xwayland(2911)-+-{Xwayland}(2914)
+           |               |                   |                |-{Xwayland}(2915)
+           |               |                   |                |-{Xwayland}(2916)
+           |               |                   |                `-{Xwayland}(2917)
+           |               |                   |-brave-browser(3759)-+-brave(3832)-+-brave(3842)---brave(3883)-+-{brave}(3899)
+           |               |                   |                     |             |                           |-{brave}(3900)
+           |               |                   |                     |             |                           |-{brave}(3901)
+           |               |                   |                     |             |                           |-{brave}(3902)
+           |               |                   |                     |             |                           |-{brave}(3907)
+           |               |                   |                     |             |                           |-{brave}(3923)
+           |               |                   |                     |             |                           |-{brave}(3924)
+           |               |                   |                     |             |                           |-{brave}(3925)
+           |               |                   |                     |             |                           |-{brave}(3926)
+           |               |                   |                     |             |                           |-{brave}(3927)
+           |               |                   |                     |             |                           |-{brave}(3928)
+           |               |                   |                     |             |                           |-{brave}(3990)
+           |               |                   |                     |             |                           |-{brave}(6016)
+           |               |                   |                     |             |                           |-{brave}(6029)
+           |               |                   |                     |             |                           |-{brave}(6030)
+           |               |                   |                     |             |                           `-{brave}(6659)
+           |               |                   |                     |             |-brave(3843)---brave(3845)-+-brave(3903)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4082)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4104)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4146)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4171)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4181)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4190)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4202)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4211)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4233)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           |-brave(4243)-+-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             |-{bra+
+           |               |                   |                     |             |                           |             `-{bra+
+           |               |                   |                     |             |                           `-brave(6810)-+-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         |-{bra+
+           |               |                   |                     |             |                                         `-{bra+
+           |               |                   |                     |             |-brave(3889)-+-{brave}(3890)
+           |               |                   |                     |             |             |-{brave}(3891)
+           |               |                   |                     |             |             |-{brave}(3892)
+           |               |                   |                     |             |             |-{brave}(3893)
+           |               |                   |                     |             |             |-{brave}(3894)
+           |               |                   |                     |             |             |-{brave}(3895)
+           |               |                   |                     |             |             |-{brave}(3896)
+           |               |                   |                     |             |             |-{brave}(3897)
+           |               |                   |                     |             |             |-{brave}(3898)
+           |               |                   |                     |             |             |-{brave}(3934)
+           |               |                   |                     |             |             |-{brave}(4080)
+           |               |                   |                     |             |             |-{brave}(4081)
+           |               |                   |                     |             |             `-{brave}(6663)
+           |               |                   |                     |             |-brave(4137)-+-{brave}(4139)
+           |               |                   |                     |             |             |-{brave}(4140)
+           |               |                   |                     |             |             |-{brave}(4142)
+           |               |                   |                     |             |             |-{brave}(4144)
+           |               |                   |                     |             |             |-{brave}(4145)
+           |               |                   |                     |             |             |-{brave}(4150)
+           |               |                   |                     |             |             |-{brave}(4151)
+           |               |                   |                     |             |             `-{brave}(6664)
+           |               |                   |                     |             |-{brave}(3840)
+           |               |                   |                     |             |-{brave}(3846)
+           |               |                   |                     |             |-{brave}(3849)
+           |               |                   |                     |             |-{brave}(3850)
+           |               |                   |                     |             |-{brave}(3851)
+           |               |                   |                     |             |-{brave}(3852)
+           |               |                   |                     |             |-{brave}(3853)
+           |               |                   |                     |             |-{brave}(3854)
+           |               |                   |                     |             |-{brave}(3855)
+           |               |                   |                     |             |-{brave}(3856)
+           |               |                   |                     |             |-{brave}(3857)
+           |               |                   |                     |             |-{brave}(3871)
+           |               |                   |                     |             |-{brave}(3872)
+           |               |                   |                     |             |-{brave}(3873)
+           |               |                   |                     |             |-{brave}(3874)
+           |               |                   |                     |             |-{brave}(3876)
+           |               |                   |                     |             |-{brave}(3877)
+           |               |                   |                     |             |-{brave}(3878)
+           |               |                   |                     |             |-{brave}(3879)
+           |               |                   |                     |             |-{brave}(3880)
+           |               |                   |                     |             |-{brave}(3881)
+           |               |                   |                     |             |-{brave}(3882)
+           |               |                   |                     |             |-{brave}(3884)
+           |               |                   |                     |             |-{brave}(3885)
+           |               |                   |                     |             |-{brave}(3886)
+           |               |                   |                     |             |-{brave}(3904)
+           |               |                   |                     |             |-{brave}(3905)
+           |               |                   |                     |             |-{brave}(3929)
+           |               |                   |                     |             |-{brave}(3930)
+           |               |                   |                     |             |-{brave}(3931)
+           |               |                   |                     |             |-{brave}(3932)
+           |               |                   |                     |             |-{brave}(3933)
+           |               |                   |                     |             `-{brave}(6603)
+           |               |                   |                     |-cat(3830)
+           |               |                   |                     `-cat(3831)
+           |               |                   |-gjs(2570)-+-{gjs}(2572)
+           |               |                   |           |-{gjs}(2573)
+           |               |                   |           |-{gjs}(2574)
+           |               |                   |           |-{gjs}(2575)
+           |               |                   |           |-{gjs}(2576)
+           |               |                   |           |-{gjs}(2577)
+           |               |                   |           |-{gjs}(2578)
+           |               |                   |           |-{gjs}(2579)
+           |               |                   |           |-{gjs}(2580)
+           |               |                   |           |-{gjs}(2581)
+           |               |                   |           |-{gjs}(2582)
+           |               |                   |           |-{gjs}(2584)
+           |               |                   |           `-{gjs}(2600)
+           |               |                   |-mutter-x11-fram(2948)-+-{mutter-x11-fram}(2949)
+           |               |                   |                       |-{mutter-x11-fram}(2961)
+           |               |                   |                       |-{mutter-x11-fram}(2962)
+           |               |                   |                       |-{mutter-x11-fram}(2963)
+           |               |                   |                       |-{mutter-x11-fram}(2964)
+           |               |                   |                       |-{mutter-x11-fram}(2965)
+           |               |                   |                       |-{mutter-x11-fram}(2966)
+           |               |                   |                       |-{mutter-x11-fram}(2967)
+           |               |                   |                       `-{mutter-x11-fram}(2968)
+           |               |                   |-nm-openvpn-auth(4367)
+           |               |                   |-nm-openvpn-auth(4668)
+           |               |                   |-nm-openvpn-auth(4680)
+           |               |                   |-nm-openvpn-auth(4690)
+           |               |                   |-nm-openvpn-auth(4739)
+           |               |                   |-nm-openvpn-auth(4826)
+           |               |                   |-nm-openvpn-auth(4836)
+           |               |                   |-nm-openvpn-auth(4841)
+           |               |                   |-nm-openvpn-auth(5162)
+           |               |                   |-nm-openvpn-auth(5167)
+           |               |                   |-spotify(3101)-+-spotify(3215)---spotify(3465)-+-{spotify}(3510)
+           |               |                   |               |                               |-{spotify}(3513)
+           |               |                   |               |                               |-{spotify}(3521)
+           |               |                   |               |                               |-{spotify}(3522)
+           |               |                   |               |                               |-{spotify}(3525)
+           |               |                   |               |                               |-{spotify}(3526)
+           |               |                   |               |                               |-{spotify}(3527)
+           |               |                   |               |                               |-{spotify}(3528)
+           |               |                   |               |                               |-{spotify}(3529)
+           |               |                   |               |                               |-{spotify}(3530)
+           |               |                   |               |                               |-{spotify}(3531)
+           |               |                   |               |                               |-{spotify}(3532)
+           |               |                   |               |                               |-{spotify}(3533)
+           |               |                   |               |                               |-{spotify}(3534)
+           |               |                   |               |                               |-{spotify}(3535)
+           |               |                   |               |                               |-{spotify}(3539)
+           |               |                   |               |                               |-{spotify}(3540)
+           |               |                   |               |                               |-{spotify}(3541)
+           |               |                   |               |                               |-{spotify}(3542)
+           |               |                   |               |                               |-{spotify}(3543)
+           |               |                   |               |                               |-{spotify}(3544)
+           |               |                   |               |                               `-{spotify}(5809)
+           |               |                   |               |-spotify(3216)-+-spotify(3479)-+-{spotify}(3480)
+           |               |                   |               |               |               |-{spotify}(3481)
+           |               |                   |               |               |               |-{spotify}(3482)
+           |               |                   |               |               |               |-{spotify}(3483)
+           |               |                   |               |               |               |-{spotify}(3484)
+           |               |                   |               |               |               |-{spotify}(3485)
+           |               |                   |               |               |               |-{spotify}(5807)
+           |               |                   |               |               |               `-{spotify}(5811)
+           |               |                   |               |               |-spotify(3545)-+-{spotify}(3546)
+           |               |                   |               |               |               |-{spotify}(3547)
+           |               |                   |               |               |               |-{spotify}(3548)
+           |               |                   |               |               |               |-{spotify}(3549)
+           |               |                   |               |               |               |-{spotify}(3550)
+           |               |                   |               |               |               |-{spotify}(3551)
+           |               |                   |               |               |               |-{spotify}(3556)
+           |               |                   |               |               |               |-{spotify}(3557)
+           |               |                   |               |               |               |-{spotify}(3563)
+           |               |                   |               |               |               |-{spotify}(3564)
+           |               |                   |               |               |               |-{spotify}(3565)
+           |               |                   |               |               |               |-{spotify}(3566)
+           |               |                   |               |               |               |-{spotify}(3581)
+           |               |                   |               |               |               |-{spotify}(3582)
+           |               |                   |               |               |               |-{spotify}(3583)
+           |               |                   |               |               |               |-{spotify}(3724)
+           |               |                   |               |               |               |-{spotify}(3725)
+           |               |                   |               |               |               |-{spotify}(3726)
+           |               |                   |               |               |               |-{spotify}(3727)
+           |               |                   |               |               |               |-{spotify}(3728)
+           |               |                   |               |               |               |-{spotify}(3729)
+           |               |                   |               |               |               |-{spotify}(3746)
+           |               |                   |               |               |               `-{spotify}(4483)
+           |               |                   |               |               `-spotify(3730)-+-{spotify}(3731)
+           |               |                   |               |                               |-{spotify}(3732)
+           |               |                   |               |                               |-{spotify}(3733)
+           |               |                   |               |                               |-{spotify}(3734)
+           |               |                   |               |                               |-{spotify}(3735)
+           |               |                   |               |                               `-{spotify}(5808)
+           |               |                   |               |-spotify(3469)-+-{spotify}(3471)
+           |               |                   |               |               |-{spotify}(3472)
+           |               |                   |               |               |-{spotify}(3473)
+           |               |                   |               |               |-{spotify}(3474)
+           |               |                   |               |               |-{spotify}(3475)
+           |               |                   |               |               |-{spotify}(3476)
+           |               |                   |               |               |-{spotify}(3477)
+           |               |                   |               |               |-{spotify}(3478)
+           |               |                   |               |               |-{spotify}(3536)
+           |               |                   |               |               |-{spotify}(3537)
+           |               |                   |               |               |-{spotify}(3538)
+           |               |                   |               |               |-{spotify}(3737)
+           |               |                   |               |               |-{spotify}(3738)
+           |               |                   |               |               |-{spotify}(3739)
+           |               |                   |               |               |-{spotify}(3740)
+           |               |                   |               |               |-{spotify}(3741)
+           |               |                   |               |               |-{spotify}(3742)
+           |               |                   |               |               |-{spotify}(3743)
+           |               |                   |               |               |-{spotify}(3744)
+           |               |                   |               |               |-{spotify}(3745)
+           |               |                   |               |               `-{spotify}(5810)
+           |               |                   |               |-{spotify}(3214)
+           |               |                   |               |-{spotify}(3413)
+           |               |                   |               |-{spotify}(3414)
+           |               |                   |               |-{spotify}(3415)
+           |               |                   |               |-{spotify}(3416)
+           |               |                   |               |-{spotify}(3417)
+           |               |                   |               |-{spotify}(3418)
+           |               |                   |               |-{spotify}(3419)
+           |               |                   |               |-{spotify}(3420)
+           |               |                   |               |-{spotify}(3424)
+           |               |                   |               |-{spotify}(3425)
+           |               |                   |               |-{spotify}(3426)
+           |               |                   |               |-{spotify}(3427)
+           |               |                   |               |-{spotify}(3456)
+           |               |                   |               |-{spotify}(3457)
+           |               |                   |               |-{spotify}(3458)
+           |               |                   |               |-{spotify}(3459)
+           |               |                   |               |-{spotify}(3460)
+           |               |                   |               |-{spotify}(3461)
+           |               |                   |               |-{spotify}(3462)
+           |               |                   |               |-{spotify}(3463)
+           |               |                   |               |-{spotify}(3464)
+           |               |                   |               |-{spotify}(3466)
+           |               |                   |               |-{spotify}(3467)
+           |               |                   |               |-{spotify}(3486)
+           |               |                   |               |-{spotify}(3487)
+           |               |                   |               |-{spotify}(3488)
+           |               |                   |               |-{spotify}(3489)
+           |               |                   |               |-{spotify}(3490)
+           |               |                   |               |-{spotify}(3491)
+           |               |                   |               |-{spotify}(3492)
+           |               |                   |               |-{spotify}(3493)
+           |               |                   |               |-{spotify}(3494)
+           |               |                   |               |-{spotify}(3495)
+           |               |                   |               |-{spotify}(3496)
+           |               |                   |               |-{spotify}(3498)
+           |               |                   |               |-{spotify}(3499)
+           |               |                   |               |-{spotify}(3500)
+           |               |                   |               |-{spotify}(3501)
+           |               |                   |               |-{spotify}(3502)
+           |               |                   |               |-{spotify}(3503)
+           |               |                   |               |-{spotify}(3504)
+           |               |                   |               |-{spotify}(3505)
+           |               |                   |               |-{spotify}(3509)
+           |               |                   |               |-{spotify}(3511)
+           |               |                   |               |-{spotify}(3514)
+           |               |                   |               |-{spotify}(3515)
+           |               |                   |               |-{spotify}(3516)
+           |               |                   |               |-{spotify}(3517)
+           |               |                   |               |-{spotify}(3518)
+           |               |                   |               |-{spotify}(3519)
+           |               |                   |               |-{spotify}(3520)
+           |               |                   |               |-{spotify}(3523)
+           |               |                   |               |-{spotify}(3554)
+           |               |                   |               |-{spotify}(3572)
+           |               |                   |               |-{spotify}(5987)
+           |               |                   |               |-{spotify}(5988)
+           |               |                   |               `-{spotify}(7001)
+           |               |                   |-{gnome-shell}(2003)
+           |               |                   |-{gnome-shell}(2004)
+           |               |                   |-{gnome-shell}(2006)
+           |               |                   |-{gnome-shell}(2007)
+           |               |                   |-{gnome-shell}(2008)
+           |               |                   |-{gnome-shell}(2009)
+           |               |                   |-{gnome-shell}(2010)
+           |               |                   |-{gnome-shell}(2011)
+           |               |                   |-{gnome-shell}(2012)
+           |               |                   |-{gnome-shell}(2013)
+           |               |                   |-{gnome-shell}(2014)
+           |               |                   |-{gnome-shell}(2015)
+           |               |                   |-{gnome-shell}(2035)
+           |               |                   |-{gnome-shell}(2037)
+           |               |                   |-{gnome-shell}(2038)
+           |               |                   |-{gnome-shell}(2042)
+           |               |                   |-{gnome-shell}(2043)
+           |               |                   |-{gnome-shell}(2047)
+           |               |                   |-{gnome-shell}(2048)
+           |               |                   |-{gnome-shell}(2050)
+           |               |                   |-{gnome-shell}(2447)
+           |               |                   |-{gnome-shell}(2491)
+           |               |                   `-{gnome-shell}(5337)
+           |               |-gnome-shell-cal(2107)-+-{gnome-shell-cal}(2109)
+           |               |                       |-{gnome-shell-cal}(2110)
+           |               |                       |-{gnome-shell-cal}(2112)
+           |               |                       |-{gnome-shell-cal}(2113)
+           |               |                       |-{gnome-shell-cal}(2114)
+           |               |                       `-{gnome-shell-cal}(2331)
+           |               |-gnome-terminal(2788)---gnome-terminal.(2790)-+-{gnome-terminal.}(2791)
+           |               |                                              |-{gnome-terminal.}(2792)
+           |               |                                              |-{gnome-terminal.}(2794)
+           |               |                                              `-{gnome-terminal.}(2795)
+           |               |-gnome-terminal-(2796)-+-bash(2803)---t1_audit.sh(7048)---pstree(7057)
+           |               |                       |-{gnome-terminal-}(2797)
+           |               |                       |-{gnome-terminal-}(2798)
+           |               |                       |-{gnome-terminal-}(2800)
+           |               |                       |-{gnome-terminal-}(2801)
+           |               |                       |-{gnome-terminal-}(2802)
+           |               |                       `-{gnome-terminal-}(4266)
+           |               |-goa-daemon(2271)-+-{goa-daemon}(2310)
+           |               |                  |-{goa-daemon}(2311)
+           |               |                  |-{goa-daemon}(2318)
+           |               |                  `-{goa-daemon}(2324)
+           |               |-goa-identity-se(2332)-+-{goa-identity-se}(2340)
+           |               |                       |-{goa-identity-se}(2341)
+           |               |                       `-{goa-identity-se}(2349)
+           |               |-gsd-a11y-settin(2136)-+-{gsd-a11y-settin}(2163)
+           |               |                       |-{gsd-a11y-settin}(2164)
+           |               |                       |-{gsd-a11y-settin}(2167)
+           |               |                       `-{gsd-a11y-settin}(2176)
+           |               |-gsd-color(2143)-+-{gsd-color}(2212)
+           |               |                 |-{gsd-color}(2214)
+           |               |                 |-{gsd-color}(2225)
+           |               |                 `-{gsd-color}(2250)
+           |               |-gsd-datetime(2147)-+-{gsd-datetime}(2182)
+           |               |                    |-{gsd-datetime}(2184)
+           |               |                    |-{gsd-datetime}(2189)
+           |               |                    `-{gsd-datetime}(2198)
+           |               |-gsd-housekeepin(2148)-+-{gsd-housekeepin}(2172)
+           |               |                       |-{gsd-housekeepin}(2174)
+           |               |                       |-{gsd-housekeepin}(2187)
+           |               |                       `-{gsd-housekeepin}(2209)
+           |               |-gsd-keyboard(2154)-+-{gsd-keyboard}(2208)
+           |               |                    |-{gsd-keyboard}(2213)
+           |               |                    |-{gsd-keyboard}(2233)
+           |               |                    `-{gsd-keyboard}(2251)
+           |               |-gsd-media-keys(2158)-+-{gsd-media-keys}(2244)
+           |               |                      |-{gsd-media-keys}(2247)
+           |               |                      |-{gsd-media-keys}(2259)
+           |               |                      `-{gsd-media-keys}(2273)
+           |               |-gsd-power(2160)-+-{gsd-power}(2210)
+           |               |                 |-{gsd-power}(2217)
+           |               |                 |-{gsd-power}(2226)
+           |               |                 |-{gsd-power}(2237)
+           |               |                 `-{gsd-power}(5693)
+           |               |-gsd-print-notif(2162)-+-{gsd-print-notif}(2191)
+           |               |                       |-{gsd-print-notif}(2192)
+           |               |                       `-{gsd-print-notif}(2195)
+           |               |-gsd-printer(2586)-+-{gsd-printer}(2587)
+           |               |                   |-{gsd-printer}(2588)
+           |               |                   `-{gsd-printer}(2589)
+           |               |-gsd-rfkill(2173)-+-{gsd-rfkill}(2199)
+           |               |                  |-{gsd-rfkill}(2202)
+           |               |                  `-{gsd-rfkill}(2220)
+           |               |-gsd-screensaver(2177)-+-{gsd-screensaver}(2193)
+           |               |                       |-{gsd-screensaver}(2194)
+           |               |                       `-{gsd-screensaver}(2215)
+           |               |-gsd-sharing(2181)-+-{gsd-sharing}(2203)
+           |               |                   |-{gsd-sharing}(2204)
+           |               |                   |-{gsd-sharing}(2205)
+           |               |                   `-{gsd-sharing}(2232)
+           |               |-gsd-smartcard(2183)-+-{gsd-smartcard}(2197)
+           |               |                     |-{gsd-smartcard}(2201)
+           |               |                     |-{gsd-smartcard}(2216)
+           |               |                     `-{gsd-smartcard}(2308)
+           |               |-gsd-sound(2188)-+-{gsd-sound}(2222)
+           |               |                 |-{gsd-sound}(2223)
+           |               |                 |-{gsd-sound}(2246)
+           |               |                 `-{gsd-sound}(2302)
+           |               |-gsd-wacom(2190)-+-{gsd-wacom}(2243)
+           |               |                 |-{gsd-wacom}(2245)
+           |               |                 |-{gsd-wacom}(2258)
+           |               |                 `-{gsd-wacom}(2272)
+           |               |-gsd-xsettings(2921)-+-{gsd-xsettings}(2923)
+           |               |                     |-{gsd-xsettings}(2924)
+           |               |                     |-{gsd-xsettings}(2925)
+           |               |                     |-{gsd-xsettings}(2926)
+           |               |                     |-{gsd-xsettings}(2927)
+           |               |                     `-{gsd-xsettings}(2928)
+           |               |-gvfs-afc-volume(2393)-+-{gvfs-afc-volume}(2395)
+           |               |                       |-{gvfs-afc-volume}(2396)
+           |               |                       |-{gvfs-afc-volume}(2397)
+           |               |                       `-{gvfs-afc-volume}(2400)
+           |               |-gvfs-goa-volume(2381)-+-{gvfs-goa-volume}(2386)
+           |               |                       |-{gvfs-goa-volume}(2387)
+           |               |                       `-{gvfs-goa-volume}(2388)
+           |               |-gvfs-gphoto2-vo(2403)-+-{gvfs-gphoto2-vo}(2407)
+           |               |                       |-{gvfs-gphoto2-vo}(2408)
+           |               |                       `-{gvfs-gphoto2-vo}(2410)
+           |               |-gvfs-mtp-volume(2369)-+-{gvfs-mtp-volume}(2377)
+           |               |                       |-{gvfs-mtp-volume}(2378)
+           |               |                       `-{gvfs-mtp-volume}(2380)
+           |               |-gvfs-udisks2-vo(2228)-+-{gvfs-udisks2-vo}(2282)
+           |               |                       |-{gvfs-udisks2-vo}(2284)
+           |               |                       |-{gvfs-udisks2-vo}(2285)
+           |               |                       `-{gvfs-udisks2-vo}(2325)
+           |               |-gvfsd(1934)-+-gvfsd-dnssd(4381)-+-{gvfsd-dnssd}(4382)
+           |               |             |                   |-{gvfsd-dnssd}(4383)
+           |               |             |                   `-{gvfsd-dnssd}(4384)
+           |               |             |-gvfsd-http(6208)-+-{gvfsd-http}(6209)
+           |               |             |                  |-{gvfsd-http}(6210)
+           |               |             |                  |-{gvfsd-http}(6211)
+           |               |             |                  `-{gvfsd-http}(6219)
+           |               |             |-gvfsd-network(4372)-+-{gvfsd-network}(4374)
+           |               |             |                     |-{gvfsd-network}(4375)
+           |               |             |                     |-{gvfsd-network}(4376)
+           |               |             |                     `-{gvfsd-network}(4380)
+           |               |             |-gvfsd-trash(2471)-+-{gvfsd-trash}(2472)
+           |               |             |                   |-{gvfsd-trash}(2473)
+           |               |             |                   |-{gvfsd-trash}(2474)
+           |               |             |                   `-{gvfsd-trash}(2477)
+           |               |             |-{gvfsd}(1937)
+           |               |             |-{gvfsd}(1938)
+           |               |             `-{gvfsd}(1939)
+           |               |-gvfsd-fuse(1942)-+-{gvfsd-fuse}(1946)
+           |               |                  |-{gvfsd-fuse}(1947)
+           |               |                  |-{gvfsd-fuse}(1948)
+           |               |                  |-{gvfsd-fuse}(1949)
+           |               |                  |-{gvfsd-fuse}(1950)
+           |               |                  `-{gvfsd-fuse}(1951)
+           |               |-gvfsd-metadata(2592)-+-{gvfsd-metadata}(2593)
+           |               |                      |-{gvfsd-metadata}(2594)
+           |               |                      `-{gvfsd-metadata}(2595)
+           |               |-ibus-daemon(2135)-+-ibus-engine-sim(2430)-+-{ibus-engine-sim}(2433)
+           |               |                   |                       |-{ibus-engine-sim}(2434)
+           |               |                   |                       `-{ibus-engine-sim}(2435)
+           |               |                   |-ibus-extension-(2321)-+-{ibus-extension-}(2353)
+           |               |                   |                       |-{ibus-extension-}(2354)
+           |               |                   |                       |-{ibus-extension-}(2357)
+           |               |                   |                       `-{ibus-extension-}(2358)
+           |               |                   |-ibus-memconf(2317)-+-{ibus-memconf}(2322)
+           |               |                   |                    |-{ibus-memconf}(2327)
+           |               |                   |                    `-{ibus-memconf}(2339)
+           |               |                   |-{ibus-daemon}(2169)
+           |               |                   |-{ibus-daemon}(2171)
+           |               |                   `-{ibus-daemon}(2185)
+           |               |-ibus-portal(2337)-+-{ibus-portal}(2347)
+           |               |                   |-{ibus-portal}(2348)
+           |               |                   `-{ibus-portal}(2352)
+           |               |-ibus-x11(2943)-+-{ibus-x11}(2945)
+           |               |                |-{ibus-x11}(2946)
+           |               |                `-{ibus-x11}(2947)
+           |               |-pipewire(1792)-+-{pipewire}(1813)
+           |               |                `-{pipewire}(1823)
+           |               |-pipewire(1793)-+-{pipewire}(1814)
+           |               |                `-{pipewire}(1818)
+           |               |-pipewire-pulse(1797)-+-{pipewire-pulse}(1815)
+           |               |                      `-{pipewire-pulse}(1822)
+           |               |-snap(3951)-+-{snap}(3952)
+           |               |            |-{snap}(3953)
+           |               |            |-{snap}(3954)
+           |               |            |-{snap}(3955)
+           |               |            |-{snap}(3956)
+           |               |            |-{snap}(3993)
+           |               |            |-{snap}(3996)
+           |               |            |-{snap}(3997)
+           |               |            |-{snap}(4004)
+           |               |            |-{snap}(4005)
+           |               |            `-{snap}(4007)
+           |               |-snapd-desktop-i(2607)---snapd-desktop-i(2659)-+-{snapd-desktop-i}(2671)
+           |               |                                               |-{snapd-desktop-i}(2672)
+           |               |                                               |-{snapd-desktop-i}(2673)
+           |               |                                               `-{snapd-desktop-i}(2674)
+           |               |-spotify(3211)-+-{spotify}(3212)
+           |               |               `-{spotify}(3213)
+           |               |-tracker-miner-f(2502)-+-{tracker-miner-f}(2505)
+           |               |                       |-{tracker-miner-f}(2506)
+           |               |                       |-{tracker-miner-f}(2507)
+           |               |                       |-{tracker-miner-f}(2513)
+           |               |                       |-{tracker-miner-f}(2514)
+           |               |                       |-{tracker-miner-f}(2527)
+           |               |                       `-{tracker-miner-f}(2528)
+           |               |-wireplumber(1796)-+-{wireplumber}(1816)
+           |               |                   |-{wireplumber}(1819)
+           |               |                   |-{wireplumber}(1820)
+           |               |                   |-{wireplumber}(1834)
+           |               |                   `-{wireplumber}(1838)
+           |               |-xdg-desktop-por(2492)-+-{xdg-desktop-por}(2493)
+           |               |                       |-{xdg-desktop-por}(2494)
+           |               |                       |-{xdg-desktop-por}(2495)
+           |               |                       |-{xdg-desktop-por}(2560)
+           |               |                       |-{xdg-desktop-por}(2568)
+           |               |                       `-{xdg-desktop-por}(2569)
+           |               |-xdg-desktop-por(2503)-+-{xdg-desktop-por}(2510)
+           |               |                       |-{xdg-desktop-por}(2511)
+           |               |                       |-{xdg-desktop-por}(2512)
+           |               |                       |-{xdg-desktop-por}(2529)
+           |               |                       `-{xdg-desktop-por}(2549)
+           |               |-xdg-desktop-por(2562)-+-{xdg-desktop-por}(2563)
+           |               |                       |-{xdg-desktop-por}(2564)
+           |               |                       |-{xdg-desktop-por}(2566)
+           |               |                       `-{xdg-desktop-por}(2567)
+           |               |-xdg-document-po(1882)-+-fusermount3(1902)
+           |               |                       |-{xdg-document-po}(1883)
+           |               |                       |-{xdg-document-po}(1884)
+           |               |                       |-{xdg-document-po}(1886)
+           |               |                       |-{xdg-document-po}(1901)
+           |               |                       |-{xdg-document-po}(1903)
+           |               |                       `-{xdg-document-po}(1904)
+           |               `-xdg-permission-(1888)-+-{xdg-permission-}(1896)
+           |                                       |-{xdg-permission-}(1897)
+           |                                       `-{xdg-permission-}(1899)
+           |-systemd-journal(418)
+           |-systemd-logind(1398)
+           |-systemd-oomd(1149)
+           |-systemd-resolve(1156)
+           |-systemd-timesyn(1160)---{systemd-timesyn}(1263)
+           |-systemd-udevd(495)
+           |-thermald(1402)-+-{thermald}(1446)
+           |                |-{thermald}(1447)
+           |                |-{thermald}(1450)
+           |                `-{thermald}(1732)
+           |-tlp-pd(3590)
+           |-udisksd(1406)-+-{udisksd}(1435)
+           |               |-{udisksd}(1437)
+           |               |-{udisksd}(1439)
+           |               |-{udisksd}(1538)
+           |               `-{udisksd}(1558)
+           |-unattended-upgr(1742)---{unattended-upgr}(1773)
+           |-upowerd(1703)-+-{upowerd}(1706)
+           |               |-{upowerd}(1707)
+           |               `-{upowerd}(1708)
+           `-wpa_supplicant(1442)

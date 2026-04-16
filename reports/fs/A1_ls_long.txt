@@ -1,0 +1,7 @@
+total 24
+drwxrwxr-x  6 denisz39 denisz39 4096 Mar  3 12:45 .
+drwxr-x--- 18 denisz39 denisz39 4096 Mar  3 21:27 ..
+drwxrwxr-x  2 denisz39 denisz39 4096 Mar  3 22:23 doc
+drwxrwxr-x  8 denisz39 denisz39 4096 Mar  3 11:27 .git
+drwxrwxr-x  6 denisz39 denisz39 4096 Mar  3 21:13 reports
+drwxrwxr-x  2 denisz39 denisz39 4096 Mar  3 22:38 tools
