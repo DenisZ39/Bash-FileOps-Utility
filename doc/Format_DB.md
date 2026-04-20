@@ -8,6 +8,8 @@ abspath esentiala pt a gasi fisierul indiferent unde se afla, checksum este spat
 ### indexer.c
 ## L am creat pentru a scrie functiile care scaneaza fisierele
 # xor_checksum
-citim fisierul pe bucati de 4kb pt a nu suprasolicita daca e prea mare, aplicam xor(^=) intre fiecare bit citit si variabila de stare, complexitate O(n),
+citim fisierul pe bucati de 4kb pt a nu suprasolicita daca e prea mare, aplicam xor(^=) intre fiecare bit citit si variabila de stare,daca aceasta suma difera de ultima suma calculata rezulta ca fisierul a fost modificat, complexitate O(n),
 # walk_dir
-recursivitate de fiecare data cand gasesc un director, eviatarea buclelor infinite trecand peste cand gasim '.'(director curent) si '..'(dir parinte), folosesc lstat pt a citi info fara sa urmaresc link urile simbolice, folosesc lpa
+recursivitate de fiecare data cand gasesc un director, eviatarea buclelor infinite trecand peste cand gasim '.'(director curent) si '..'(dir parinte), folosesc lstat pt a citi info fara sa urmaresc link urile simbolice,iar pt fiecare fisier in calculezul hash ul si ii afisez adresa de la radacina
+# main
+am adaugat main ul de care nu ne putem lipsi pt a rula codul, din main, orice director rulez fiecarui fisier din el ii sunt salvate informatiile obtinute din fct walk_dir in index.db care este un fisier binar

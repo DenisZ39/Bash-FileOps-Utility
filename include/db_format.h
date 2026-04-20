@@ -2,6 +2,8 @@
 #include <dirent.h>//pt a deschide foldere si a putea vedea ce e in ele
 #include <sys/stat.h>//detalii despre fisier (marime, ultima modificare, etc)
 #include <stdlib.h>//pt realpath
+#include <stdio.h>
+
 struct db_header{
     char magic[6];
     uint8_t format_version;
@@ -23,4 +25,4 @@ struct file_record{
 }__attribute__((packed));
 
 uint32_t xor_checksum(const char *path);
-void walk_dir(const char *root_p);
+void walk_dir(const char *root_p,FILE *output, uint64_t *count);
