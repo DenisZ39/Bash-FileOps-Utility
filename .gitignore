@@ -1,4 +1,4 @@
 bin/*
 logs/*.log
 data/*.db
-
+vscode/*
