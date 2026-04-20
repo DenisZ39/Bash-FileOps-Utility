@@ -1,0 +1,4 @@
+bin/*
+logs/*.log
+data/*.db
+

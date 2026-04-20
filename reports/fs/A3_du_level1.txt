@@ -1,5 +1,0 @@
-192K	./.git
-128K	./reports
-8.0K	./tools
-12K	./doc
-344K	.

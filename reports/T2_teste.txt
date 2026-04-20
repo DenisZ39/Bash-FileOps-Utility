@@ -1,2 +1,0 @@
-PASS - tests/test_bun.sh
-FAIL - tests/test_gresit.sh

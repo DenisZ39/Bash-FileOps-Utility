@@ -1,170 +1,152 @@
 #!/bin/bash
 
+### LOG ###
+START_TIME=$(date +%s)
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+LOG_FILE="logs/fileops_$TIMESTAMP.log"
 mkdir -p logs
-Timp_start_sec=$(date +%s)
-Timp_start_formatat=$(date +"%Y-%m-%d %H:%M:%S")
-Fisier_log="logs/fileops_$(date +%Y%m%d_%H%M%S).log"
-Subcomanda_rulata="$1"
-log_final(){
-	cod_iesire=$?
-	timp_end_sec=$(date +%s)
-	timp_end_formatat=$(date +"%Y-%m-%d %H:%M:%S")
-	diferenta=$((timp_end_sec - Timp_start_sec))
-	echo "Subcomanda rulata: $Subcomanda_rulata" > "$Fisier_log"
-	echo "Timestamp start: $Timp_start_formatat" >> "$Fisier_log"
-	echo "Timestamp end: $timp_end_formatat" >> "$Fisier_log"
-	echo "Diferenta: $diferenta" >> "$Fisier_log"
-	echo "Exit code: $cod_iesire" >> "$Fisier_log"
-}
-trap log_final EXIT
 
-function_init(){
-echo "Start Init"
-mkdir -p bin src include data logs reports tmp tests doc tools
-
-if ! command -v gcc &> /dev/null; then 
-	echo "Error: compilatorul gcc nu este intalat"
-	exit 1
-else echo "Succes"
-fi
-echo "Init complete"
+function finalizeaza_log() {
+    local EXIT_CODE=$?
+    local END_TIME=$(date +%s)
+    local DURATA=$((END_TIME - START_TIME))
+    {
+        echo "Subcomanda rulata: $comanda"
+        echo "Timestamp start: $(date -d @$START_TIME)"
+        echo "Timestamp end:   $(date -d @$END_TIME)"
+        echo "Durata:          ${DURATA} secunde"
+        echo "Exit code:       $EXIT_CODE"
+    } > "$LOG_FILE"
 }
 
-recursiv(){
-local folder_curent="$1"
-for fisier in "$folder_curent"/*; do
-	if [ -d "$fisier" ]; then
-		recursiv "$fisier"
-	elif [ -f "$fisier" ] && [[ "$fisier" == *.c ]]; then
-		local nume_fisier=$(basename "$fisier")
-		local nume_baza="${nume_fisier%.*}"
-		local fisier_obj="tmp/obj/${nume_baza}.o"
-		if [ ! -f "$fisier_obj" ] || [ "$fisier" -nt "$fisier_obj" ]; then
-			echo "[GCC] Compilez: $fisier -> $fisier_obj"
-			gcc $CFLAGS -c "$fisier" -o "$fisier_obj"
-			if [ $? -ne 0 ]; then
-				echo "Error la compilare $fisier!!!"
-				exit 1
-			fi
-		else
-			echo "[SKIP] $fisier este nu are modificare, nu-l compilam"
-		fi
+trap finalizeaza_log EXIT
 
-	fi
-done
+### 1) Initializare ###
+check_gcc(){
+    if ! command -v gcc &> /dev/null; then
+        echo "Nu este instalat gcc" >&2
+        exit 1
+    fi
 }
 
-function_build(){
-echo "Start Build"
-Folder_sursa="src"
-if [ "$2" == "--src" ] && [ -n "$3" ]; then
-	Folder_sursa="$3"
-fi
-echo "Caut in $Folder_sursa"
-if [ ! -d "$Folder_sursa" ]; then 
-	echo "Error: folderul $Folder_sursa nu exita"
-	exit 1
-fi
-mkdir -p bin tmp/obj
-recursiv "$Folder_sursa"
-local module_aux=""
-for obj in tmp/obj/*.o; do
-	[ -e "$obj" ] || continue
-	local nume_obj=$(basename "$obj")
-	if [[ "$nume_obj" != main_* ]]; then
-		module_aux="$module_aux $obj"
-	fi
-done
-local main=0
-for main_obj in tmp/obj/main_*.o; do
-	[ -e "$main_obj" ] || continue
-	main=1
-	local nume_main_obj=$(basename "$main_obj")
-	local nume_exe="${nume_main_obj#main_}"
-	nume_exe="${nume_exe%.o}"
-	echo "[LINK] Executabil final: bin/$nume_exe"
-	gcc $CFLAGS "$main_obj" $module_aux -o "bin/$nume_exe"
-	if [ $? -ne 0 ]; then
-		echo "Eroare la creare executabilul bin/$nume_exe!"
-		exit 1
-	fi
-done
-if [ $main -eq 0 ]; then
-	echo "[INFO] Niciun fisier main_*.c gasit. Am compilat doar modulele aux"
-fi
-echo "Build complet"
+init(){
+    echo "Se creeaza structura proiectului."
+    check_gcc
+    mkdir -p bin src include data logs reports tmp/obj tests doc tools
+    echo "Structura creata cu succes"
 }
 
-function_run(){
-echo "Start Run"
-if [ "$2" != "--" ]; then
-	echo "Error: lipseste '--'"
-	echo "Folosire: $0 run -- nume_executabil [argumente...]"
-	exit 1
-fi
-
-EXECUTABIL="$3"
-
-if [ ! -x "bin/$EXECUTABIL" ]; then
-	echo "Error: executabilul 'bin/$EXECUTABIL' nu exista sau nu are permisiune de rulare"
-	exit 1
-fi
-
-shift 3
-./bin/"$EXECUTABIL" "$@"
-COD_IESIRE=$?
-exit $COD_IESIRE
+### 2) Build ###
+find_c_files(){
+    local n=$1
+    # Verificam daca folderul exista
+    [ ! -d "$n" ] && return
+    for item in "$n"/*; do
+        if [ -d "$item" ]; then
+            find_c_files "$item"
+        elif [[ "$item" == *.c ]]; then
+            C_FILES+=("$item")
+        fi
+    done
 }
 
-function_clean(){
-echo "Clean"
-rm -rf bin/* 2>/dev/null
-rm -rf tmp/obj/* 2>/dev/null
-echo "Fisierele generate de build au fost sterse din bin/ si tmp/obj/"
+build(){
+    local src_dir="src"
+    while [ "$#" -gt 0 ]; do
+       case $1 in
+            --src) src_dir="$2"; shift ;;
+       esac
+       shift
+    done
+
+    mkdir -p tmp/obj bin
+    declare -a C_FILES=()
+    find_c_files "$src_dir"
+    
+    # Mai intai compilam toate modulele in .o
+    local all_objs=()
+    for param in "${C_FILES[@]}"; do
+        local filename=$(basename "$param")
+        local obj="tmp/obj/${filename%.c}.o"
+        
+        if [ ! -f "$obj" ] || [ "$param" -nt "$obj" ]; then
+            gcc $CFLAGS -c "$param" -o "$obj" -Iinclude -Wall -Wextra
+        fi
+        
+        if [[ "$filename" != main_* ]]; then
+            all_objs+=("$obj")
+        fi
+    done
+
+    # Apoi generam executabilele pentru main-uri
+    for param in "${C_FILES[@]}"; do
+        local filename=$(basename "$param")
+        if [[ "$filename" == main_* ]]; then
+            local obj="tmp/obj/${filename%.c}.o"
+            local exe_name="bin/${filename#main_}"
+            exe_name="${exe_name%.c}"
+            # Link-uim cu TOATE obiectele pentru a avea acces la utilitare
+            gcc "$obj" "${all_objs[@]}" -o "$exe_name"
+        fi
+    done
+
 }
 
-function_test(){
-echo "Start Test"
-mkdir -p reports
-> reports/T2_tests.txt
-Teste_picate=0
-for test_script in $(find tests/ -type f -name "*.sh" 2>/dev/null); do
-	echo "Rules testul: $test_script"
-	chmod +x "$test_script"
-	./"$test_script"
-	if [ $? -eq 0 ]; then
-		echo "PASS - $test_script" >> reports/T2_tests.txt
-		echo " -> [PASS]"
-	else
-		echo "FAIL - $test_script" >> reports/T2_tests.txt
-		echo " -> [FAIL]"
-		Teste_picate=$((Teste_picate+1))
-	fi
-done
-echo "Raportul a fost scris in reports/T2_tests.txt"
-if [ "$Teste_picate" -gt 0 ]; then
-	echo "$Teste_picate teste au picat"
-	exit 1
-else
-	echo "Toate testele sunt trecute"
-	exit 0
-fi
+### 3) Run ###
+run(){
+    # Trecem peste 'run'
+    shift 
+    # Cautam separatorul --
+    while [[ "$1" != "--" && $# -gt 0 ]]; do shift; done  
+    shift # Trecem peste --
+    
+    local exe="./bin/$1"
+    shift # Raman doar argumentele programului
+    if [ -x "$exe" ]; then
+        "$exe" "$@"
+    else
+        echo "Eroare: $exe nu exista sau nu e executabil." >&2
+        exit 1
+    fi
 }
 
+### 4) Clean ###
+clean(){
+    rm -rf tmp/obj/* bin/*
+}
+
+### 5) Test ###
+testare(){
+    echo "Incepe procesul de testare"
+    mkdir -p reports
+    local report_file="reports/T2_tests.txt"
+    > "$report_file"
+
+    mapfile -t test_files < <(find tests -type f -name "*.sh")
+
+    local global_status=0 
+    
+    for t_script in "${test_files[@]}"; do
+        chmod +x "$t_script"
+        # Rulam si capturam rezultatul
+        if "./$t_script"; then
+            echo "$(basename "$t_script") PASS" >> "$report_file"
+        else
+            echo "$(basename "$t_script") FAIL" >> "$report_file"
+            global_status=1
+        fi
+    done
+    cat "$report_file"
+    return $global_status
+}
+
+# --- ENTRY POINT ---
 comanda=$1
-
-case "$comanda" in
-	"init")
-		function_init;;
-	"build")
-		function_build "$@";;
-	"run")
-		function_run "$@";;
-	"clean")
-		function_clean;;
-	"test")
-		function_test;;
-	*)
-		echo "error";;
+case $comanda in
+    init)  init ;;
+    build) build "$@" ;;
+    run)   run "$@" ;;
+    clean) clean ;;
+    test)  testare ;;
+    *)     echo "Utilizare: $0 {init|build|run|clean|test}" ;;
 esac
-
