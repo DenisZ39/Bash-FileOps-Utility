@@ -1,2 +1,0 @@
-test_init.sh PASS
-test_build_recursive.sh PASS
