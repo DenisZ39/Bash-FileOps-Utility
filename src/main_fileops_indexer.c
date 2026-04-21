@@ -1,4 +1,4 @@
-//#include "db_format.h"
+#include "db_format.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -11,29 +11,8 @@
 #include <stdint.h>
 #include <time.h>
 
-typedef struct {
-    char magic[4];
-    uint32_t format_version;
-    uint64_t snapshot_id;
-    uint32_t active_writers;
-    uint32_t record_count;
-    uint8_t snapshot_state;
-} db_header;
 
-typedef struct{
-    char cale[4096];
-    uint32_t type; // fisier (1), director(2), symlink(3), fifo(4)
-    uint64_t size; // st_size
-    time_t mtime; // st_mtime
-    uint32_t checksum; // xor binar
-    uint64_t inode; // st_ino
-    uint64_t device; // st_dev
-} file_record;
-
-#define STATE_OPEN   0
-#define STATE_SEALED 1
-
-void set_lock(int fd, int type, int offset, int len){
+int set_lock(int fd, int type, int offset, int len){
     struct flock lock;
     lock.l_type = type; 
     lock.l_whence = SEEK_SET;
@@ -42,7 +21,38 @@ void set_lock(int fd, int type, int offset, int len){
     return fcntl(fd, F_SETLKW, &lock);
 }
 
-void parcurge_recursiv(const char* cale, const char* data_base){
+void update(int fd, file_record *file){
+    file_record existing_record;
+    db_header header;
+    int found_pos = -1;
+    lseek(fd, sizeof(db_header), SEEK_SET);
+    while((read(fd, &existing_record, sizeof(file_record))) == sizeof(file_record)){
+        if(strcmp(existing_record.cale, file->cale) == 0){
+            found_pos = lseek(fd, 0, SEEK_CUR) - sizeof(file_record);
+            break;
+        }
+    }
+    if(found_pos != -1){
+        set_lock(fd, F_WRLCK, found_pos, sizeof(file_record));
+        lseek(fd, found_pos, SEEK_SET);
+        write(fd, file, sizeof(file_record));
+        set_lock(fd, F_UNLCK, found_pos, sizeof(file_record));
+    }
+    else{
+        set_lock(fd, F_WRLCK, 0, sizeof(db_header));
+        lseek(fd, 0, SEEK_END);
+        write(fd, file, sizeof(file_record));
+        lseek(fd, 0, SEEK_SET);
+        read(fd, &header, sizeof(header));
+        header.record_count++;
+        lseek(fd, 0, SEEK_SET);
+        write(fd, &header, sizeof(db_header));
+        set_lock(fd, F_UNLCK, 0, sizeof(db_header));
+    }
+}
+
+
+void parcurge_recursiv(const char* cale, int fd){
     DIR *dir = opendir(cale);
     if(dir == NULL){
         perror("eroare deschidere director");
@@ -53,14 +63,28 @@ void parcurge_recursiv(const char* cale, const char* data_base){
     struct stat st;
     char cale_noua[4096];
     while((d = readdir(dir)) != NULL){
+        
         if(strcmp(d->d_name, "..") == 0 || strcmp(d->d_name, ".") == 0) continue;
         sprintf(cale_noua, "%s/%s", cale, d->d_name);
         if(lstat(cale_noua, &st) == -1) continue;
-        printf("%s | %ld ", cale_noua, st.st_size);
+        file_record file;
+        memset(&file, 0, sizeof(file_record));
+        strncpy(file.cale, cale_noua, sizeof(file.cale) - 1);        
+        file.size = st.st_size;
+        file.mtime = st.st_mtime;
+        file.inode = st.st_ino;
+        file.device = st.st_dev;
+        if(S_ISREG(st.st_mode)) file.type = 1;
+        if(S_ISDIR(st.st_mode)) file.type = 2;
+        if(S_ISLNK(st.st_mode)) file.type = 3;
+        if(S_ISFIFO(st.st_mode)) file.type = 4;
+        update(fd, &file);        
+
         if(S_ISDIR(st.st_mode)){
-            parcurge_recursiv(cale_noua, data_base);
+            parcurge_recursiv(cale_noua, fd);
         }
     }
+    closedir(dir);
 }
 
 int main(int argc, char* argv[]){
@@ -89,6 +113,7 @@ int main(int argc, char* argv[]){
     set_lock(fd, F_WRLCK, 0, sizeof(db_header));
     db_header header;
     if((read(fd, &header, sizeof(header))) < sizeof(header)){
+        memset(&header, 0, sizeof(db_header));
         strncpy(header.magic, "IDX1", 4);
         header.format_version = 1;
         header.snapshot_state = STATE_OPEN;
@@ -109,7 +134,7 @@ int main(int argc, char* argv[]){
     write(fd, &header, sizeof(db_header));
     set_lock(fd, F_UNLCK, 0, sizeof(db_header));
 
-    parcurge_recursiv(director, data_base);
+    parcurge_recursiv(director, fd);
 
     set_lock(fd, F_WRLCK, 0, sizeof(db_header));
     lseek(fd, 0, SEEK_SET);
