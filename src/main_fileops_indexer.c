@@ -1,4 +1,4 @@
-#include "db_format.h"
+#include "../include/db_format.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,6 +25,7 @@ void update(int fd, file_record *file){
     file_record existing_record;
     db_header header;
     int found_pos = -1;
+    set_lock(fd, F_WRLCK, 0, 0);
     lseek(fd, sizeof(db_header), SEEK_SET);
     while((read(fd, &existing_record, sizeof(file_record))) == sizeof(file_record)){
         if(strcmp(existing_record.cale, file->cale) == 0){
@@ -33,13 +34,10 @@ void update(int fd, file_record *file){
         }
     }
     if(found_pos != -1){
-        set_lock(fd, F_WRLCK, found_pos, sizeof(file_record));
         lseek(fd, found_pos, SEEK_SET);
         write(fd, file, sizeof(file_record));
-        set_lock(fd, F_UNLCK, found_pos, sizeof(file_record));
     }
     else{
-        set_lock(fd, F_WRLCK, 0, sizeof(db_header));
         lseek(fd, 0, SEEK_END);
         write(fd, file, sizeof(file_record));
         lseek(fd, 0, SEEK_SET);
@@ -47,10 +45,23 @@ void update(int fd, file_record *file){
         header.record_count++;
         lseek(fd, 0, SEEK_SET);
         write(fd, &header, sizeof(db_header));
-        set_lock(fd, F_UNLCK, 0, sizeof(db_header));
     }
+    set_lock(fd,F_UNLCK,0,0);
 }
 
+uint32_t calculeaza_checksum(const char* cale){
+    int fd_fisier=open(cale, O_RDONLY);
+    if(fd_fisier==-1)
+        return 0;
+    uint32_t checksum=0;
+    uint32_t buffer=0;
+    while(read(fd_fisier,&buffer,sizeof(buffer))>0){
+        checksum^=buffer;
+        buffer=0;
+    }
+    close(fd_fisier);
+    return checksum;
+}
 
 void parcurge_recursiv(const char* cale, int fd){
     DIR *dir = opendir(cale);
@@ -59,7 +70,6 @@ void parcurge_recursiv(const char* cale, int fd){
         return ;
     }
     struct dirent *d;
-    struct flock lock;
     struct stat st;
     char cale_noua[4096];
     while((d = readdir(dir)) != NULL){
@@ -74,7 +84,10 @@ void parcurge_recursiv(const char* cale, int fd){
         file.mtime = st.st_mtime;
         file.inode = st.st_ino;
         file.device = st.st_dev;
-        if(S_ISREG(st.st_mode)) file.type = 1;
+        if(S_ISREG(st.st_mode)) {
+            file.type = 1;
+            file.checksum = calculeaza_checksum(cale_noua);
+        }
         if(S_ISDIR(st.st_mode)) file.type = 2;
         if(S_ISLNK(st.st_mode)) file.type = 3;
         if(S_ISFIFO(st.st_mode)) file.type = 4;
@@ -112,9 +125,9 @@ int main(int argc, char* argv[]){
     }
     set_lock(fd, F_WRLCK, 0, sizeof(db_header));
     db_header header;
-    if((read(fd, &header, sizeof(header))) < sizeof(header)){
+    if((read(fd, &header, sizeof(header))) < (ssize_t)sizeof(header)){
         memset(&header, 0, sizeof(db_header));
-        strncpy(header.magic, "IDX1", 4);
+        memcpy(header.magic, "IDX1", 4);
         header.format_version = 1;
         header.snapshot_state = STATE_OPEN;
         header.active_writers = 1;
