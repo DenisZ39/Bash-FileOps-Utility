@@ -23,3 +23,13 @@ typedef struct{
     uint64_t inode; // st_ino
     uint64_t device; // st_dev
 } file_record;
+
+typedef struct{
+    uint32_t pid;
+    uint32_t ppid;
+    char state;
+    char comm[256];
+    uint64_t user_time;
+    uint64_t kernel_time;
+    uint64_t rss;
+} proc_record;
