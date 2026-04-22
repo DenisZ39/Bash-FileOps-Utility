@@ -29,7 +29,7 @@ typedef struct{
     uint32_t ppid;
     char state;
     char comm[256];
-    uint64_t user_time;
-    uint64_t kernel_time;
+    char cmdline[256];
+    uint64_t cpu_time;
     uint64_t rss;
 } proc_record;

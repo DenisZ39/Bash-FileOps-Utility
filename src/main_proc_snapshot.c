@@ -79,19 +79,68 @@ void parcurge_director(int fd){
             proc.pid = atoi(d->d_name);
             char linie[256];
             if(f_status != NULL){
-            while(fgets(linie, sizeof(linie), f_status)){
-                if(strncmp(linie, "PPid:", 5) == 0){
-                    proc.ppid = atoi(linie + 5);
+                while(fgets(linie, sizeof(linie), f_status)){
+                    if(strncmp(linie, "PPid:", 5) == 0){
+                        proc.ppid = atoi(linie + 5);
+                    }
+                    else if(strncmp(linie, "Name:", 5) == 0){
+                        sscanf(linie + 5, "%s", proc.comm);
+                    }
+                    else if(strncmp(linie, "State:", 6) == 0){
+                        char *p = linie + 6;
+                        while(*p == ' ' || *p == '\t') p++;
+                        proc.state = *p;
+                    }
+                    else if(strncmp(linie, "VmRSS:", 6) == 0){
+                        proc.rss = strtoull(linie + 6, NULL, 10);
+                    }
                 }
-                if(strncmp(linie, "Name:", 5) == 0){
-                    sscanf(linie + 5, "%s", proc.comm);
-                }
-                if(strncmp(linie, "State:", 6) == 0){
-                    proc.state = *(linie + 7);
-                }
-             }
+                close(f_status);
             }
-            fclose(f_status);
+            char cale_cmd[4096];
+            sprintf(cale_cmd, "/proc/%s/cmdline", d->d_name);
+            int fd_cmd = open(cale_cmd, O_RDONLY);
+            if(fd_cmd != -1){
+                int bytes = read(fd_cmd, proc.cmdline, sizeof(proc.cmdline) - 1);
+                if(bytes > 0){
+                    proc.cmdline[bytes] = '\0';
+                    for(int i = 0; i < bytes; i++){
+                        if(proc.cmdline[i] == '\0'){
+                            proc.cmdline[i] = ' ';
+                        }
+                    }
+                }
+            close(fd_cmd);
+            }
+            char cale_stat[4096];
+            sprintf(cale_stat, "/proc/%s/stat", d->d_name);
+            int fd_stat = open(cale_stat, O_RDONLY);
+            if(fd_stat != -1){
+                char buffer[4096];
+                int arg_counter = 0;
+                int bytes_read;
+                long long int utime = 0, stime = 0;
+                bytes_read = read(fd_stat, &buffer, 4096);
+                int i = 0;
+                while(i < bytes_read){
+                    if(buffer[i] == ' '){
+                        arg_counter++;
+                    }
+                    if(arg_counter == 13){
+                        if(buffer[i] >= '0' && buffer[i] <= '9'){
+                            utime = utime * 10 + (buffer[i] - '0');
+                        }
+                    }
+                    if(arg_counter == 14){
+                        if(buffer[i] >= '0' && buffer[i] <= '9'){
+                            stime = stime * 10 + (buffer[i] - '0');
+                        }
+                    }
+                    i++;
+                }
+                proc.cpu_time = utime + stime;
+                close(fd_stat);
+            }            
             update(fd, &proc);
         }
     }
