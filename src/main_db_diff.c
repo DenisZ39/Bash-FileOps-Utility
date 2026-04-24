@@ -1,4 +1,4 @@
-#include "db_format.h"
+#include "/home/andrei/tema3cuDenis/include/db_format.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -7,6 +7,7 @@
 #include <errno.h>
 
 void compare_files(file_record *old, int nr_old, file_record *new, int nr_new, FILE *f_out){
+    printf("Compar %d records din old cu %d din new\n", nr_old, nr_new);
     for(int i = 0; i < nr_old; i++){
         char *nume_cautat = old[i].cale;
         int found = 0;
@@ -35,7 +36,7 @@ void compare_files(file_record *old, int nr_old, file_record *new, int nr_new, F
         if(found == 0){
             fprintf(f_out, "Adaugat: file record %s\n", nume_cautat);
         }
-    }
+    } 
 }
 void compare_procs(proc_record *old, int nr_old, proc_record *new, int nr_new, FILE *f_out){
     for(int i = 0; i < nr_old; i++){
@@ -114,9 +115,11 @@ int main(int argc, char* argv[]){
         return 4;
     }
     db_header h1, h2;
+    lseek(fd_old, 0, SEEK_SET);
+    lseek(fd_new, 0, SEEK_SET);
     read(fd_old, &h1, sizeof(db_header));
     read(fd_new, &h2, sizeof(db_header));
-    if(strcmp(h1.magic, h2.magic) != 0){
+    if(strncmp(h1.magic, h2.magic, 4) != 0){
         fprintf(stderr, "snapshoturi de tip diferit");
         close(fd_old);
         close(fd_new);

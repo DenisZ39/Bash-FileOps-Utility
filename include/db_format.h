@@ -6,7 +6,7 @@
 #define STATE_SEALED 1
 
 typedef struct {
-    char magic[4];
+    char magic[5];
     uint32_t format_version;
     uint64_t snapshot_id;
     uint32_t active_writers;

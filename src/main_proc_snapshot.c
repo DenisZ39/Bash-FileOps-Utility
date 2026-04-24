@@ -36,8 +36,8 @@ void update(int fd, proc_record *proc){
         set_lock(fd, F_UNLCK, found_pos, sizeof(proc_record));
     }
     else{
-        int pos_final = lseek(fd, 0, SEEK_END);
         set_lock(fd, F_WRLCK, 0, sizeof(db_header));
+        int pos_final = lseek(fd, 0, SEEK_END);
         set_lock(fd, F_WRLCK, pos_final, sizeof(proc_record));
         db_header header;
         lseek(fd, 0, SEEK_SET);
@@ -45,11 +45,12 @@ void update(int fd, proc_record *proc){
         header.record_count++;
         lseek(fd, 0, SEEK_SET);
         write(fd, &header, sizeof(db_header));
-        set_lock(fd, F_UNLCK, 0, sizeof(db_header));
 
         lseek(fd, pos_final, SEEK_SET);
         write(fd, proc, sizeof(proc_record));
         set_lock(fd, F_UNLCK, pos_final, sizeof(proc_record));
+        set_lock(fd, F_UNLCK, 0, sizeof(db_header));
+
 
     }
 }
@@ -95,7 +96,7 @@ void parcurge_director(int fd){
                         proc.rss = strtoull(linie + 6, NULL, 10);
                     }
                 }
-                close(f_status);
+                fclose(f_status);
             }
             char cale_cmd[4096];
             sprintf(cale_cmd, "/proc/%s/cmdline", d->d_name);
@@ -165,7 +166,7 @@ int main(int argc, char* argv[]){
     set_lock(fd, F_WRLCK, 0, sizeof(db_header));
     if((read(fd, &header, sizeof(db_header))) < sizeof(db_header)){
         memset(&header, 0, sizeof(db_header)); // baza de date si o initializam acum
-        strncpy(header.magic, "PRC1", 4);
+        strncpy(header.magic, "PRC1", 5);
         header.format_version = 1;
         header.snapshot_state = STATE_OPEN;
         header.active_writers = 1;
@@ -177,7 +178,7 @@ int main(int argc, char* argv[]){
             printf("snapshot sealed\n");
             set_lock(fd, F_UNLCK, 0, sizeof(db_header));
             close(fd);
-            return 0;
+            return 1;
         }
         header.active_writers++;
     }

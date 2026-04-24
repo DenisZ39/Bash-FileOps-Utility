@@ -113,13 +113,15 @@ run(){
 ### 4) Clean ###
 clean(){
     rm -rf tmp/obj/* bin/*
+    rm -rf data/*
+    rm -rf tests/dir1 tests/dir2 tests/dir3
 }
 
 ### 5) Test ###
 testare(){
     echo "Incepe procesul de testare"
     mkdir -p reports
-    local report_file="reports/T2_tests.txt"
+    local report_file="reports/tests.txt"
     > "$report_file"
 
     mapfile -t test_files < <(find tests -type f -name "*.sh")

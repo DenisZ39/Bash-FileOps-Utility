@@ -1,0 +1,3 @@
+Sters: file record tests/dir2//file_1.txt
+Modificat: file record tests/dir1//file_1.txt
+Adaugat: file record tests/dir2//file_100.txt

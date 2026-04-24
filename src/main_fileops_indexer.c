@@ -73,8 +73,8 @@ void update(int fd, file_record *file){
             set_lock(fd, F_UNLCK, found_pos, sizeof(file_record));
         }
         else{
-            int pos_final = lseek(fd, 0, SEEK_END); // daca nu, dam append la final
             set_lock(fd, F_WRLCK, 0, sizeof(db_header)); // dam lock pe header ca sa incrementam nr records
+            int pos_final = lseek(fd, 0, SEEK_END); // daca nu, dam append la final
             set_lock(fd, F_WRLCK, pos_final, sizeof(file_record)); // dam lock pe finalul bazei de date ca sa putem scrie file recordul curent
             lseek(fd, 0, SEEK_END);
             write(fd, file, sizeof(file_record));
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
     db_header header;
     if((read(fd, &header, sizeof(db_header))) < sizeof(db_header)){ // daca initial nu citim sizeof(db_header) biti inseamna ca nu avem un header, adica nu e initializata
         memset(&header, 0, sizeof(db_header)); // baza de date si o initializam acum
-        strncpy(header.magic, "IDX1", 4);
+        strncpy(header.magic, "IDX1", 5);
         header.format_version = 1;
         header.snapshot_state = STATE_OPEN;
         header.active_writers = 1;
@@ -165,13 +165,15 @@ int main(int argc, char* argv[]){
             printf("snapshot sealed\n");
             set_lock(fd, F_UNLCK, 0, sizeof(db_header));
             close(fd);
-            return 0;
+            return 1;
         }
         header.active_writers++; // daca nu incrementam active writers
     }
     lseek(fd, 0, SEEK_SET);
     write(fd, &header, sizeof(db_header));
     set_lock(fd, F_UNLCK, 0, sizeof(db_header));
+    sleep(1);
+
 
     parcurge_recursiv(director, fd); // parcurgem recursiv
 
