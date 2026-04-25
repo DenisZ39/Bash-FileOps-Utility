@@ -110,7 +110,7 @@ void parcurge_recursiv(const char* cale, int fd){
         memset(&file, 0, sizeof(file_record));
         strncpy(file.cale, cale_noua, sizeof(file.cale) - 1);        
         file.size = st.st_size;
-        file.mtime = st.st_mtime;
+        file.mtime = (unsigned long)st.st_mtime;
         file.inode = st.st_ino;
         file.device = st.st_dev;
         file.checksum = 0;
