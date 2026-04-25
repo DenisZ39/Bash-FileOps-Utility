@@ -47,6 +47,8 @@ void update(int fd, file_record *file){
     int found_pos = -1;
     lseek(fd, sizeof(db_header), SEEK_SET); // sarim mereu peste header cand citim file records
     while((read(fd, &existing_record, sizeof(file_record))) == sizeof(file_record)){
+        // chiar daca in descrierea temei se precizeaza ca comparam doua file_recorduri dupa cale, ne-ati mentionat la laborator ca doua fisiere sunt aceleasi daca au acelasi inode si device
+        //deci m-am gandit sa adaug si asta in plus, chiar daca nu cere
         if(existing_record.device == file->device && existing_record.inode == file->inode){ // cautam sa vedem daca nu cumva avem deja recordul file in baza de date
             found_pos = lseek(fd, 0, SEEK_CUR) - sizeof(file_record); // ne uitam dupa inode si device
             break;
@@ -74,7 +76,7 @@ void update(int fd, file_record *file){
         }
         else{
             set_lock(fd, F_WRLCK, 0, sizeof(db_header)); // dam lock pe header ca sa incrementam nr records
-            int pos_final = lseek(fd, 0, SEEK_END); // daca nu, dam append la final
+            int pos_final = lseek(fd, 0, SEEK_END); // aflam ultima pozitie din snapshot pentru append la final
             set_lock(fd, F_WRLCK, pos_final, sizeof(file_record)); // dam lock pe finalul bazei de date ca sa putem scrie file recordul curent
             lseek(fd, 0, SEEK_END);
             write(fd, file, sizeof(file_record));
@@ -172,7 +174,8 @@ int main(int argc, char* argv[]){
     lseek(fd, 0, SEEK_SET);
     write(fd, &header, sizeof(db_header));
     set_lock(fd, F_UNLCK, 0, sizeof(db_header));
-    sleep(1);
+    sleep(1); // adaugat just in case pathul oferit ca argument nu are multe fisiere si se termina citirea lor inainte ca celelalte instante paralele sa inceapa, altfel exista sanse
+    // sa se puna snapshot sealed instant
 
 
     parcurge_recursiv(director, fd); // parcurgem recursiv

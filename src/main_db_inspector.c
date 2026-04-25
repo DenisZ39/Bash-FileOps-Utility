@@ -16,3 +16,4 @@ int main(int argc, char *argv[]) {
     printf("%d", expected);
     
 }
+// program folosit special pentru a returna marimea teoretica a fisierului ca sa ma pot folosi de ea in t3_concurrency.sh
