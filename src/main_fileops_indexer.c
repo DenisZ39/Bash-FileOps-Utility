@@ -10,17 +10,17 @@
 #include <stdint.h>
 #include <time.h>
 
-uint32_t checksum_compute(const char* path){
+unsigned int checksum_compute(const char* path){
     int fd = open(path, O_RDONLY);
     if(fd == -1){
         return 0;
     }
-    uint32_t suma = 0;
-    uint32_t buffer; // citim cate 4 octeti
+    unsigned int suma = 0;
+    unsigned int buffer; // citim cate 4 octeti
     int bytes_read;
-    while((bytes_read = read(fd, &buffer, sizeof(uint32_t))) > 0){
-        if(bytes_read < sizeof(uint32_t)){ // daca ultima citire e incompleta lipim
-            uint32_t last_part = 0;
+    while((bytes_read = read(fd, &buffer, sizeof(unsigned int))) > 0){
+        if(bytes_read < (int)sizeof(unsigned int)){ // daca ultima citire e incompleta lipim
+            unsigned int last_part = 0;
             memcpy(&last_part, &buffer, bytes_read);
             suma ^= last_part;
         }
@@ -99,7 +99,6 @@ void parcurge_recursiv(const char* cale, int fd){
         return ;
     }
     struct dirent *d;
-    struct flock lock;
     struct stat st;
     char cale_noua[4096];
     while((d = readdir(dir)) != NULL){
@@ -153,7 +152,7 @@ int main(int argc, char* argv[]){
     }
     set_lock(fd, F_WRLCK, 0, sizeof(db_header)); 
     db_header header;
-    if((read(fd, &header, sizeof(db_header))) < sizeof(db_header)){ // daca initial nu citim sizeof(db_header) biti inseamna ca nu avem un header, adica nu e initializata
+    if((read(fd, &header, sizeof(db_header))) < (int)sizeof(db_header)){ // daca initial nu citim sizeof(db_header) biti inseamna ca nu avem un header, adica nu e initializata
         memset(&header, 0, sizeof(db_header)); // baza de date si o initializam acum
         strncpy(header.magic, "IDX1", 5);
         header.format_version = 1;

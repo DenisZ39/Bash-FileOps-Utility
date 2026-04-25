@@ -40,7 +40,7 @@ void compare_files(file_record *old, int nr_old, file_record *new, int nr_new, F
 }
 void compare_procs(proc_record *old, int nr_old, proc_record *new, int nr_new, FILE *f_out){
     for(int i = 0; i < nr_old; i++){ // la procese cautam dupa pid, din old in new mai intai
-        int pid_cautat = old[i].pid;
+        unsigned int pid_cautat = old[i].pid;
         int found = 0;
         for(int j = 0; j < nr_new; j++){
             if(pid_cautat == new[j].pid){
@@ -59,7 +59,7 @@ void compare_procs(proc_record *old, int nr_old, proc_record *new, int nr_new, F
         }
     }
     for(int i = 0; i < nr_new; i++){ // cautam in sens invers sa vedem procesele noi adaugate
-        int pid_cautat = new[i].pid;
+        unsigned int pid_cautat = new[i].pid;
         int found = 0;
         for(int j = 0; j < nr_old; j++){
             if(pid_cautat == old[j].pid){

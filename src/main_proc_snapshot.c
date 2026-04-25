@@ -165,7 +165,7 @@ int main(int argc, char* argv[]){
     }
     db_header header;
     set_lock(fd, F_WRLCK, 0, sizeof(db_header));
-    if((read(fd, &header, sizeof(db_header))) < sizeof(db_header)){// daca nu citim macar sizeof(db_header) initial, inseamna ca baza de date nu e initializata deci
+    if((read(fd, &header, sizeof(db_header))) < (int)sizeof(db_header)){// daca nu citim macar sizeof(db_header) initial, inseamna ca baza de date nu e initializata deci
         memset(&header, 0, sizeof(db_header)); // o initializam acum
         strncpy(header.magic, "PRC1", 5);
         header.format_version = 1;
