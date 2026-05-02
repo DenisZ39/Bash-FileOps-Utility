@@ -1,4 +1,4 @@
-#include "/home/andrei/homework/R11_homework_repo_10/T4/include/format.h"
+#include "../include/format.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -76,9 +76,9 @@ int main(int argc, char* argv[]){
         lseek(fd_verify, sizeof(db_header) + header.file_record_count * sizeof(file_record), SEEK_SET); // citim staturile workerilor
         unsigned int files_emitted_total = 0; // pentru a compara header.file_record_count cu numarul de fisiere transmise de catre fiecare worker
         unsigned long long bytes_emitted_total = 0; // pentru a compara dimensiunile tuturor fisierelor transmise de catre workeri cu dimensiunile fisierelor din file_records
-        for(int i = 0; i < header.worker_count; i++){
+        for(unsigned int i = 0; i < header.worker_count; i++){
             worker_stats worker;
-            if(read(fd_verify, &worker, sizeof(worker_stats)) < sizeof(worker_stats)){
+            if(read(fd_verify, &worker, sizeof(worker_stats)) < (unsigned)sizeof(worker_stats)){
                 fprintf(stderr, "inventar incomplet");
                 exit(15);
             }
@@ -92,9 +92,9 @@ int main(int argc, char* argv[]){
         
         unsigned long long dimensiune_file_records = 0;
         lseek(fd_verify, sizeof(db_header), SEEK_SET);
-        for(int i = 0; i < header.file_record_count; i++){ // citim dimensiunile tuturor file_recordsurilor
+        for(unsigned int i = 0; i < header.file_record_count; i++){ // citim dimensiunile tuturor file_recordsurilor
             file_record fisier;
-            if(read(fd_verify, &fisier, sizeof(file_record)) < sizeof(file_record)){
+            if(read(fd_verify, &fisier, sizeof(file_record)) < (unsigned)sizeof(file_record)){
                 fprintf(stderr, "inventar incomplet");
                 exit(15);
             }
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]){
         }
         db_header header;
         lseek(fd_inventar, 0, SEEK_SET);
-        if((read(fd_inventar, &header, sizeof(db_header))) < sizeof(db_header)){
+        if((read(fd_inventar, &header, sizeof(db_header))) < (unsigned)sizeof(db_header)){
             fprintf(stderr, "fisier inventar incomplet/neinitializat");
             exit(19);
         }
@@ -262,7 +262,7 @@ int main(int argc, char* argv[]){
         }
         for(int j = 0; j < workers_number; j++){
             sem_wait(&shm->mutex_stats);
-            if(shm->stats[j].pid == pid){ // cautam workerul cu pid-ul selectat mai sus
+            if(shm->stats[j].pid == (unsigned int)pid){ // cautam workerul cu pid-ul selectat mai sus
                 shm->stats[j].exit_status = exit_code;
                 sem_post(&shm->mutex_stats);
                 break;

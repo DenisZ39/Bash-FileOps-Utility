@@ -1,5 +1,5 @@
 #pragma once
-#include <limits.h>
+#include <linux/limits.h>
 #include <semaphore.h>
 
 #define MAX_WORKERS 32

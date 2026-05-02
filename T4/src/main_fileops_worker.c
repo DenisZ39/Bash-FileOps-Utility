@@ -1,4 +1,4 @@
-#include "/home/andrei/homework/R11_homework_repo_10/T4/include/format.h"
+#include "../include/format.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -11,6 +11,28 @@
 #include <dirent.h>
 #include <sys/resource.h>
 #include <limits.h>
+
+void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
+    char comanda[4096];
+    
+    // comanda ca in terminal sha256sum `data/fisierul_meu.txt`
+    snprintf(comanda, sizeof(comanda), "sha256sum \"%s\"", cale);
+
+    // rulăm comanda cu popen
+    FILE *terminal_invizibil = popen(comanda, "r");
+    if (terminal_invizibil == NULL) {
+        return;
+    }
+    char rezultat_text[100]; 
+    // citim rezultatul comenzii care va fi în format text și conține hash ul urmat de numele fișierului
+    if (fgets(rezultat_text, sizeof(rezultat_text), terminal_invizibil) != NULL) {
+        //transformăm textul citit în 32 bytes
+        for (int i = 0; i < 32; i++) {
+            sscanf(&rezultat_text[i * 2], "%2hhx", &hash_rezultat[i]);
+        }
+    }
+    pclose(terminal_invizibil);
+}
 
 void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data *shm){
     DIR *dir = opendir(cale);
@@ -53,7 +75,7 @@ void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data 
             fisier.gid = st.st_gid;
             fisier.mode = st.st_mode;
             fisier.mtime = st.st_mtime;
-            // fisier.sha256
+            calculeaza_hash_fisier(cale_noua, fisier.sha256);
             sem_wait(&shm->mutex_active_jobs);
             shm->file_record_count++;
             sem_post(&shm->mutex_active_jobs);
@@ -114,8 +136,8 @@ int main(int argc, char* argv[]){
         shm->jobs.head = (shm->jobs.head + 1) % JOB_QUEUE_SIZE;
         sem_post(&shm->jobs.mutex);
         sem_post(&shm->jobs.empty);
-        if(j.depth < shm->max_depth || shm->max_depth == 0){
-            parcurgere_director(j.path, j.depth, worker_id, timp_testare, shm);
+        if((unsigned int)j.depth < shm->max_depth || shm->max_depth == 0){
+            parcurge_director(j.path, j.depth, worker_id, timp_testare, shm);
         }
         sem_wait(&shm->mutex_active_jobs);
         shm->active_jobs--;
