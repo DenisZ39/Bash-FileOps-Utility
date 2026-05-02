@@ -123,6 +123,22 @@ int main(int argc, char* argv[]){
         exit(0);
 
     }
+    if(dump_flag != 0){
+        int fd_inventar = open(db_inventar, O_RDONLY);
+        if(fd_inventar == -1){
+            fprintf(stderr, "eroare deschidere inventar pentru dump");
+            exit(18);
+        }
+        db_header header;
+        lseek(fd_inventar, 0, SEEK_SET);
+        if((read(fd_inventar, &header, sizeof(db_header))) < sizeof(db_header)){
+            fprintf(stderr, "fisier inventar incomplet/neinitializat");
+            exit(19);
+        }
+        printf("Magic=%s\n", header.magic);
+        printf("version=%d\ncomplete=%d\nfile_record_count=%d\nworker_count=%d\n", header.version, header.complete, header.file_record_count, header.worker_count);
+        exit(0);
+    }
     int fd = open(ipc_fisier, O_RDWR | O_CREAT | O_TRUNC, 0600);
     if(fd == -1){
         fprintf(stderr, "eroare deschidere fisier partajat");
