@@ -1,4 +1,4 @@
-
+#pragma once
 #include <limits.h>
 #include <semaphore.h>
 
@@ -22,7 +22,7 @@ typedef struct{
     int exit_status;
     unsigned int jobs_processed;
     unsigned int files_emitted;
-    unsigned long bytes_emitted;
+    unsigned long long bytes_emitted;
     long wall_time_ms;
     long user_cpu_us;
     long sys_cpu_us;
@@ -37,6 +37,9 @@ typedef struct{
     char magic[5];
     unsigned int format_version;
     unsigned int is_finished;
+    unsigned int file_record_count;
+    unsigned int max_depth;
+    sem_t mutex_active_jobs;
     int active_jobs;
     struct{
         job buffer[JOB_QUEUE_SIZE];
@@ -54,6 +57,14 @@ typedef struct{
         sem_t empty;
         sem_t full;
     } results;
-
+    sem_t mutex_stats;
     worker_stats stats[MAX_WORKERS];
 } ipc_shared_data;
+
+typedef struct{
+    char magic[5];
+    unsigned int version;
+    unsigned int complete;
+    unsigned int file_record_count;
+    unsigned int worker_count;
+} db_header;

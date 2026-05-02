@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <dirent.h>
 
 int main(int argc, char* argv[]){
     char *director_root = NULL;
@@ -16,6 +17,8 @@ int main(int argc, char* argv[]){
     char *db_inventar = "data/inventory.db";
     int max_depth = 0;
     int timp_testare = 0;
+    int verify_flag = 0;
+    int dump_flag = 0;
 
     for(int i = 1; i < argc; i++){
         if(strcmp(argv[i], "--root") == 0){
@@ -48,8 +51,78 @@ int main(int argc, char* argv[]){
                 timp_testare = atoi(argv[i + 1]);
             }
         }
+        if(strcmp(argv[i], "--verify") == 0){
+            verify_flag = 1;
+        }
+        if(strcmp(argv[i], "--dump") == 0){
+            dump_flag = 1;
+        }
     }
+    if(director_root == NULL || opendir(director_root) == NULL){
+        fprintf(stderr, "fisier radacina invalid");
+        exit(2);
+    }
+    if(verify_flag != 0){
+        int fd_verify = open(db_inventar, O_RDONLY);
+        if(fd_verify == -1){
+            fprintf(stderr, "eroare deschidere inventar in mod verify");
+            exit(11);
+        }
+        db_header header;
+        if(read(fd_verify, &header, sizeof(db_header)) != sizeof(db_header)){
+            fprintf(stderr, "inventar neinitializat");
+            exit(10);
+        }
+        lseek(fd_verify, sizeof(db_header) + header.file_record_count * sizeof(file_record), SEEK_SET);
+        unsigned int files_emitted_total = 0;
+        unsigned long long bytes_emitted_total = 0;
+        for(int i = 0; i < header.worker_count; i++){
+            worker_stats worker;
+            if(read(fd_verify, &worker, sizeof(worker_stats)) < sizeof(worker_stats)){
+                fprintf(stderr, "inventar incomplet");
+                exit(15);
+            }
+            files_emitted_total += worker.files_emitted;
+            bytes_emitted_total += worker.bytes_emitted;
+        }
+        if(files_emitted_total != header.file_record_count){
+            fprintf(stderr, "inconsistenta numar de file records");
+            exit(16);
+        }
+        struct stat st;
+        fstat(fd_verify, &st);
+        unsigned long long dimensiune_file_records = 0;
+        lseek(fd_verify, sizeof(db_header), SEEK_SET);
+        for(int i = 0; i < header.file_record_count; i++){
+            file_record fisier;
+            if(read(fd_verify, &fisier, sizeof(file_record)) < sizeof(file_record)){
+                fprintf(stderr, "inventar incomplet");
+                exit(15);
+            }
+            dimensiune_file_records += fisier.size;
+        }
+        if(dimensiune_file_records != bytes_emitted_total){
+            fprintf(stderr, "inconsistenta dimensiune invnetar");
+            exit(17);
+        }
+        if(strcmp(header.magic, "INV4") != 0){
+            fprintf(stderr, "magic gresit la inventar");
+            exit(12);
+        }
+        if(header.version != 1){
+            fprintf(stderr, "versiune inventar gresita");
+            exit(13);
+        }
+       
+        if(header.complete != 1){
+            fprintf(stderr, "inventar oprit inainte de a fi terminat");
+            exit(15);
+        }
+        printf("Verificare reusita si contine %u inregistrari", header.file_record_count);
+        close(fd_verify);
+        exit(0);
 
+    }
     int fd = open(ipc_fisier, O_RDWR | O_CREAT | O_TRUNC, 0600);
     if(fd == -1){
         fprintf(stderr, "eroare deschidere fisier partajat");
@@ -66,10 +139,11 @@ int main(int argc, char* argv[]){
     }
     close(fd);
 
-    strcpy(&shm->magic, "IPC1");
+    strcpy(shm->magic, "IPC1");
     shm->format_version = 1;
     shm->is_finished = 0;
     shm->active_jobs = 0;
+    shm->max_depth = max_depth;
     sem_init(&shm->mutex_active_jobs, 1, 1);
     
     shm->jobs.head = 0;
@@ -83,6 +157,8 @@ int main(int argc, char* argv[]){
     sem_init(&shm->results.mutex, 1, 1);
     sem_init(&shm->results.empty, 1, RESULTS_CAPACITY);
     sem_init(&shm->results.full, 1, 0);
+    
+    sem_init(&shm->mutex_stats, 1, 1);
 
     sem_wait(&shm->jobs.empty);
     sem_wait(&shm->mutex_active_jobs);
@@ -102,11 +178,22 @@ int main(int argc, char* argv[]){
             exit(5);
         }
         if(pid == 0){
-            char id[10];
+            char id[11];
+            char ms[11];
             snprintf(id, sizeof(id), "%d", i);
-            execl("bin/fileops_worker", "fileops_worker", "--worker-id", id, "--ipc", ipc_fisier, NULL);
+            snprintf(ms, sizeof(ms), "%d", timp_testare);
+            execl("bin/fileops_worker", "fileops_worker", "--worker-id", id, "--ipc", ipc_fisier, "--simulate-work-ms", ms, NULL);
             perror("eroare execl");
             exit(6);
+        }
+        else{
+            sem_wait(&shm->mutex_stats);
+            shm->stats[i].worker_id = i;
+            shm->stats[i].pid = pid;
+            shm->stats[i].files_emitted = 0;
+            shm->stats[i].jobs_processed = 0;
+            shm->stats[i].bytes_emitted = 0;
+            sem_post(&shm->mutex_stats);
         }
     }
 
@@ -132,11 +219,16 @@ int main(int argc, char* argv[]){
         }
         else{
             if(shm->active_jobs == 0){
+                shm->is_finished = 1;
+                for(int i = 0; i < workers_number; i++){
+                    sem_post(&shm->jobs.full);
+                }
                 break;
             }
             usleep(100);
         }
     }
+
     for(int i = 0; i < workers_number; i++){
         int status;
         int pid = waitpid(-1, &status, 0);
@@ -148,10 +240,13 @@ int main(int argc, char* argv[]){
             exit_code = 128 + WTERMSIG(status);
         }
         for(int j = 0; j < workers_number; j++){
+            sem_wait(&shm->mutex_stats);
             if(shm->stats[j].pid == pid){
                 shm->stats[j].exit_status = exit_code;
+                sem_post(&shm->mutex_stats);
                 break;
             }
+            sem_post(&shm->mutex_stats);
         }
     }
 
@@ -163,15 +258,16 @@ int main(int argc, char* argv[]){
     header.file_record_count = records_count;
 
     char *data_base_temp = "tmp/data_base_tmp.db";
-    int fd = open(data_base_temp, O_RDWR | O_CREAT |O_TRUNC, 0644);
-    if(fd == -1){
+    int fd_db = open(data_base_temp, O_RDWR | O_CREAT |O_TRUNC, 0644);
+    if(fd_db == -1){
         perror("eroare deschidere data_base final");
         exit(10);
     }
-    lseek(fd, 0, SEEK_SET);
-    write(fd, &header, sizeof(db_header));
-    write(fd, all_records, records_count * sizeof(file_record));
-    write(fd, shm->stats, workers_number * sizeof(worker_stats));
+    lseek(fd_db, 0, SEEK_SET);
+    write(fd_db, &header, sizeof(db_header));
+    write(fd_db, all_records, records_count * sizeof(file_record));
+    write(fd_db, shm->stats, workers_number * sizeof(worker_stats));
+
     sem_destroy(&shm->mutex_active_jobs);
     sem_destroy(&shm->jobs.mutex);
     sem_destroy(&shm->jobs.empty);
@@ -179,9 +275,10 @@ int main(int argc, char* argv[]){
     sem_destroy(&shm->results.mutex);
     sem_destroy(&shm->results.empty);
     sem_destroy(&shm->results.full);
+    sem_destroy(&shm->mutex_stats);
     munmap(shm, sizeof(ipc_shared_data));
 
-    close(fd);
+    close(fd_db);
     rename(data_base_temp, db_inventar);
 
 }
