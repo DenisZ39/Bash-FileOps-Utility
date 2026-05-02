@@ -58,10 +58,7 @@ int main(int argc, char* argv[]){
             dump_flag = 1;
         }
     }
-    if(director_root == NULL || opendir(director_root) == NULL){ // verifica existenta directorului root
-        fprintf(stderr, "fisier radacina invalid");
-        exit(2);
-    }
+    
     if(verify_flag != 0){ // daca suntem in mod verify
         int fd_verify = open(db_inventar, O_RDONLY); // deschidem inventarul
         if(fd_verify == -1){
@@ -134,12 +131,17 @@ int main(int argc, char* argv[]){
             fprintf(stderr, "fisier inventar incomplet/neinitializat");
             exit(19);
         }
-        printf("Magic=%s\n", header.magic);
+        printf("magic=%s\n", header.magic);
         printf("version=%d\ncomplete=%d\nfile_record_count=%d\nworker_count=%d\n", header.version, header.complete, header.file_record_count, header.worker_count);
         exit(0);
     }
     // daca ajungem pana aici inseamna ca suntem in mod inventariere
     //deschidem fisierul ipc si initializam shared memory ul
+    if(director_root == NULL || opendir(director_root) == NULL){ // verifica existenta directorului root
+        fprintf(stderr, "fisier radacina invalid");
+        exit(2);
+    }
+
     int fd = open(ipc_fisier, O_RDWR | O_CREAT | O_TRUNC, 0600);
     if(fd == -1){
         fprintf(stderr, "eroare deschidere fisier partajat");

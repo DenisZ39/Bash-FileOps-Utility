@@ -11,6 +11,8 @@
 #include <dirent.h>
 #include <sys/resource.h>
 #include <limits.h>
+#include <ctype.h>
+
 
 void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
     char comanda[4096];
@@ -18,17 +20,32 @@ void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
     // comanda ca in terminal sha256sum `data/fisierul_meu.txt`
     snprintf(comanda, sizeof(comanda), "sha256sum \"%s\"", cale);
 
-    // rulăm comanda cu popen
+    // rulam comanda cu popen
     FILE *terminal_invizibil = popen(comanda, "r");
     if (terminal_invizibil == NULL) {
         return;
     }
     char rezultat_text[100]; 
-    // citim rezultatul comenzii care va fi în format text și conține hash ul urmat de numele fișierului
+    // citim rezultatul comenzii care va fi în format text si conține hash ul urmat de numele fisierului
     if (fgets(rezultat_text, sizeof(rezultat_text), terminal_invizibil) != NULL) {
-        //transformăm textul citit în 32 bytes
-        for (int i = 0; i < 32; i++) {
-            sscanf(&rezultat_text[i * 2], "%2hhx", &hash_rezultat[i]);
+        int nr_cur = 0;
+        char elem;
+        for (int i = 0; i < 64 && rezultat_text[i] != ' '; i++) {
+            elem = tolower(rezultat_text[i]);
+             int cif = 0;
+            if(elem >= '0' && elem <='9'){
+                cif = elem - '0';
+            }
+            else {
+                cif = elem - 'a' + 10;
+            }
+            if(i % 2 == 0){
+                nr_cur = cif * 16;
+            }
+            else{
+                nr_cur += cif;
+                hash_rezultat[i/2] = nr_cur;
+            }
         }
     }
     pclose(terminal_invizibil);
