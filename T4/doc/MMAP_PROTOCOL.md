@@ -43,6 +43,8 @@ typedef struct{
 ## 3. Coada de Job uri si Buffer ul Circular
 Pentru a gestiona directoarele si rezultatele am ales sa folosim o structura de tip buffer circular peste un vector de capacitate fixa. Capacitatea este stabilita la 128 pentru job uri si 256 pentru canalul de rezultate
 
+Am ales aceste limite in primul rand, intr un arbore normal exista mult mai multe fisiere regulate decat directoare, de aceea am pus `RESULTS_CAPACITY` 256 sa fie dublu fata de `JOB_QUEUE_SIZE` 128. Asa evitam ca workerii sa stea blocati prea mult timp in backpressure atunci cand gasesc multe fisiere la rand dandu i timp managerului sa le citeasca. In acelasi timp nu am ales limite foarte mari ca sa nu umflam inutil dimensiunea fisierului mapat in memorie, mai ales ca managerul consuma oricum rezultatele intr un ritm destul de rapid
+
 Folosim doua pozitii, `head` pentru citire si `tail` pentru scriere care avanseaza modulo dimensiunea maxima a cozii, de exemplu `(shm->jobs.head + 1) % JOB_QUEUE_SIZE`. Managerul plaseaza directorul root pe pozitia 0 la inceput, dupa care workerii introduc la randul lor job uri in coada cand dau de subdirectoare
 
 ## 4. Backpressure si Sincronizare
