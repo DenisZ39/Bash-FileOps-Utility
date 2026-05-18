@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
     int workers_number = 0;
     char *ipc_fisier = "data/ipc.mmap";
     char *db_inventar = "data/inventory.db";
-    char *pid_path = "";
+    char *pid_path = NULL;
     int max_depth = 0;
     int timp_testare = 0; // --simulate-work-ms
     int timeout_shutdown = 5;
@@ -164,7 +164,15 @@ int main(int argc, char* argv[]){
     }
     // daca ajungem pana aici inseamna ca suntem in mod inventariere
     //deschidem fisierul ipc si initializam shared memory ul
-    signal(SIGUSR1, handle_sigusr1);
+    FILE *f_pid = fopen(pid_path, "w");
+    if(f_pid == NULL){
+        perror("eroare deschidiere fisier pid");
+        exit(1);
+    }
+    fprintf(f_pid, "%d", getpid());
+    fclose(f_pid);
+
+    signal(SIGUSR1, handle_sigusr1); //schimbam executia signalelor
     signal(SIGINT, handle_sigterm_sigint);
     signal(SIGTERM, handle_sigterm_sigint);
     signal(SIGCHLD, handle_sigchld);
