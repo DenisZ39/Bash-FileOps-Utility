@@ -57,10 +57,17 @@ void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
     pclose(terminal_invizibil);
 }
 
-void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data *shm){
+void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data *shm, int control_fd){
     DIR *dir = opendir(cale);
     if(dir == NULL){
-        fprintf(stderr, "eroare deschidere director");
+        char msg_err[256];
+        snprintf(msg_err, sizeof(msg_err), "T5MSG type=ERROR worker_id=%d errno=%d where=opendir\n", id, errno);
+        
+        if (control_fd >= 0) {
+            write(control_fd, msg_err, strlen(msg_err));
+        }
+        
+        fprintf(stderr, "eroare deschidere director\n");
         return;
     }
     struct dirent *d;
@@ -76,6 +83,7 @@ void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data 
             perror("eroare stat");
             return;
         }
+        
         if(S_ISDIR(st.st_mode)){
             sem_wait(&shm->mutex_active_jobs);
             shm->active_jobs++;
@@ -127,6 +135,7 @@ void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data 
 int main(int argc, char* argv[]){
     int worker_id = -1;
     char *ipc_fisier = "data/ipc.mmap";
+    int fd_out = -1;
     int timp_testare = 0;
     for(int i = 1; i < argc; i++){
         if(strcmp(argv[i], "--worker-id") == 0){
@@ -142,6 +151,11 @@ int main(int argc, char* argv[]){
         if(strcmp(argv[i], "--simulate-work-ms") == 0){
             if(i + 1 < argc){
                 timp_testare = atoi(argv[i + 1]);
+            }
+        }
+        if(strcmp(argv[i], "--control-fd") == 0){
+            if(i + 1 < argc){
+                fd_out = atoi(argv[i + 1]);
             }
         }
     }
@@ -171,7 +185,7 @@ int main(int argc, char* argv[]){
         sem_post(&shm->jobs.mutex);
         sem_post(&shm->jobs.empty);
         if((unsigned int)j.depth < shm->max_depth || shm->max_depth == 0){
-            parcurge_director(j.path, j.depth, worker_id, timp_testare, shm);
+            parcurge_director(j.path, j.depth, worker_id, timp_testare, shm, fd_out);
         }
         sem_wait(&shm->mutex_active_jobs);
         shm->active_jobs--;
@@ -179,7 +193,20 @@ int main(int argc, char* argv[]){
 
         sem_wait(&shm->mutex_stats);
         shm->stats[worker_id].jobs_processed++;
+
+        int total_jobs = shm->stats[worker_id].jobs_processed;
+        unsigned int total_files = shm->stats[worker_id].files_emitted;
+        unsigned long long total_bytes = shm->stats[worker_id].bytes_emitted;
         sem_post(&shm->mutex_stats);
+
+        char msg_done[512];
+        snprintf(msg_done, sizeof(msg_done), 
+                 "T5MSG type=JOB_DONE worker_id=%d jobs=%d files=%u bytes=%llu\n", 
+                 worker_id, total_jobs, total_files, total_bytes);
+        
+        if (fd_out >= 0) {
+            write(fd_out, msg_done, strlen(msg_done));
+        }
     }
 
     struct rusage usage;
@@ -190,6 +217,14 @@ int main(int argc, char* argv[]){
     shm->stats[worker_id].sys_cpu_us = usage.ru_stime.tv_sec;
     sem_post(&shm->mutex_stats);
 
+    const char *reason = worker_shutdown_requested ? "shutdown" : "normal";
+    char msg_exit[256];
+    snprintf(msg_exit, sizeof(msg_exit), "T5MSG type=WORKER_EXITING worker_id=%d reason=%s\n", worker_id, reason);
+    
+    if (fd_out >= 0) {
+        write(fd_out, msg_exit, strlen(msg_exit));
+        close(fd_out);
+    }
     munmap(shm, sizeof(ipc_shared_data));
     exit(0);
 }

@@ -25,6 +25,83 @@ void handle_sigchld(int sig){
     child_died = 1;
 }
 
+void verify(const char* db_inventar){
+    int fd_verify = open(db_inventar, O_RDONLY); // deschidem inventarul
+        if(fd_verify == -1){
+            fprintf(stderr, "eroare deschidere inventar in mod verify");
+            exit(11);
+        }
+        db_header header; // citim headerul
+        if(read(fd_verify, &header, sizeof(db_header)) != sizeof(db_header)){ // daca nu putem citi headerul inseamna ca fisierul e neinitializat
+            fprintf(stderr, "inventar neinitializat");
+            exit(10);
+        }
+        lseek(fd_verify, sizeof(db_header) + header.file_record_count * sizeof(file_record), SEEK_SET); // citim staturile workerilor
+        unsigned int files_emitted_total = 0; // pentru a compara header.file_record_count cu numarul de fisiere transmise de catre fiecare worker
+        unsigned long long bytes_emitted_total = 0; // pentru a compara dimensiunile tuturor fisierelor transmise de catre workeri cu dimensiunile fisierelor din file_records
+        for(unsigned int i = 0; i < header.worker_count; i++){
+            worker_stats worker;
+            if(read(fd_verify, &worker, sizeof(worker_stats)) < (unsigned)sizeof(worker_stats)){
+                fprintf(stderr, "inventar incomplet");
+                exit(15);
+            }
+            files_emitted_total += worker.files_emitted;
+            bytes_emitted_total += worker.bytes_emitted;
+        }
+        if(files_emitted_total != header.file_record_count){ // inconsistenta legata de sincronizarea proceselor
+            fprintf(stderr, "inconsistenta numar de file records");
+            exit(16);
+        }
+        
+        unsigned long long dimensiune_file_records = 0;
+        lseek(fd_verify, sizeof(db_header), SEEK_SET);
+        for(unsigned int i = 0; i < header.file_record_count; i++){ // citim dimensiunile tuturor file_recordsurilor
+            file_record fisier;
+            if(read(fd_verify, &fisier, sizeof(file_record)) < (unsigned)sizeof(file_record)){
+                fprintf(stderr, "inventar incomplet");
+                exit(15);
+            }
+            dimensiune_file_records += fisier.size;
+        }
+        if(dimensiune_file_records != bytes_emitted_total){
+            fprintf(stderr, "inconsistenta dimensiune invnetar");
+            exit(17);
+        }
+        if(strcmp(header.magic, "INV4") != 0){
+            fprintf(stderr, "magic gresit la inventar");
+            exit(12);
+        }
+        if(header.version != 1){
+            fprintf(stderr, "versiune inventar gresita");
+            exit(13);
+        }
+       
+        if(header.complete != 1){
+            fprintf(stderr, "inventar oprit inainte de a fi terminat");
+            exit(15);
+        }
+        printf("Verificare reusita si contine %u inregistrari", header.file_record_count); // totul in regula
+        close(fd_verify);
+        exit(0);
+
+}
+
+void dump(const char* db_inventar){
+    int fd_inventar = open(db_inventar, O_RDONLY);
+    if(fd_inventar == -1){
+        fprintf(stderr, "eroare deschidere inventar pentru dump");
+        exit(18);
+    }
+    db_header header;
+    lseek(fd_inventar, 0, SEEK_SET);
+    if((read(fd_inventar, &header, sizeof(db_header))) < (unsigned)sizeof(db_header)){
+        fprintf(stderr, "fisier inventar incomplet/neinitializat");
+        exit(19);
+    }
+    printf("magic=%s\n", header.magic);
+    printf("version=%d\ncomplete=%d\nfile_record_count=%d\nworker_count=%d\n", header.version, header.complete, header.file_record_count, header.worker_count);
+    exit(0);
+}
 int main(int argc, char* argv[]){
     char *director_root = NULL;
     int workers_number = 0;
@@ -87,91 +164,22 @@ int main(int argc, char* argv[]){
     }
     
     if(verify_flag != 0){ // daca suntem in mod verify
-        int fd_verify = open(db_inventar, O_RDONLY); // deschidem inventarul
-        if(fd_verify == -1){
-            fprintf(stderr, "eroare deschidere inventar in mod verify");
-            exit(11);
-        }
-        db_header header; // citim headerul
-        if(read(fd_verify, &header, sizeof(db_header)) != sizeof(db_header)){ // daca nu putem citi headerul inseamna ca fisierul e neinitializat
-            fprintf(stderr, "inventar neinitializat");
-            exit(10);
-        }
-        lseek(fd_verify, sizeof(db_header) + header.file_record_count * sizeof(file_record), SEEK_SET); // citim staturile workerilor
-        unsigned int files_emitted_total = 0; // pentru a compara header.file_record_count cu numarul de fisiere transmise de catre fiecare worker
-        unsigned long long bytes_emitted_total = 0; // pentru a compara dimensiunile tuturor fisierelor transmise de catre workeri cu dimensiunile fisierelor din file_records
-        for(unsigned int i = 0; i < header.worker_count; i++){
-            worker_stats worker;
-            if(read(fd_verify, &worker, sizeof(worker_stats)) < (unsigned)sizeof(worker_stats)){
-                fprintf(stderr, "inventar incomplet");
-                exit(15);
-            }
-            files_emitted_total += worker.files_emitted;
-            bytes_emitted_total += worker.bytes_emitted;
-        }
-        if(files_emitted_total != header.file_record_count){ // inconsistenta legata de sincronizarea proceselor
-            fprintf(stderr, "inconsistenta numar de file records");
-            exit(16);
-        }
-        
-        unsigned long long dimensiune_file_records = 0;
-        lseek(fd_verify, sizeof(db_header), SEEK_SET);
-        for(unsigned int i = 0; i < header.file_record_count; i++){ // citim dimensiunile tuturor file_recordsurilor
-            file_record fisier;
-            if(read(fd_verify, &fisier, sizeof(file_record)) < (unsigned)sizeof(file_record)){
-                fprintf(stderr, "inventar incomplet");
-                exit(15);
-            }
-            dimensiune_file_records += fisier.size;
-        }
-        if(dimensiune_file_records != bytes_emitted_total){
-            fprintf(stderr, "inconsistenta dimensiune invnetar");
-            exit(17);
-        }
-        if(strcmp(header.magic, "INV4") != 0){
-            fprintf(stderr, "magic gresit la inventar");
-            exit(12);
-        }
-        if(header.version != 1){
-            fprintf(stderr, "versiune inventar gresita");
-            exit(13);
-        }
-       
-        if(header.complete != 1){
-            fprintf(stderr, "inventar oprit inainte de a fi terminat");
-            exit(15);
-        }
-        printf("Verificare reusita si contine %u inregistrari", header.file_record_count); // totul in regula
-        close(fd_verify);
-        exit(0);
-
+        verify(db_inventar);
     }
     if(dump_flag != 0){ // afisam informatiile headerului
-        int fd_inventar = open(db_inventar, O_RDONLY);
-        if(fd_inventar == -1){
-            fprintf(stderr, "eroare deschidere inventar pentru dump");
-            exit(18);
-        }
-        db_header header;
-        lseek(fd_inventar, 0, SEEK_SET);
-        if((read(fd_inventar, &header, sizeof(db_header))) < (unsigned)sizeof(db_header)){
-            fprintf(stderr, "fisier inventar incomplet/neinitializat");
-            exit(19);
-        }
-        printf("magic=%s\n", header.magic);
-        printf("version=%d\ncomplete=%d\nfile_record_count=%d\nworker_count=%d\n", header.version, header.complete, header.file_record_count, header.worker_count);
-        exit(0);
+        dump(db_inventar);
     }
     // daca ajungem pana aici inseamna ca suntem in mod inventariere
     //deschidem fisierul ipc si initializam shared memory ul
-    FILE *f_pid = fopen(pid_path, "w");
-    if(f_pid == NULL){
-        perror("eroare deschidiere fisier pid");
-        exit(1);
+    if(pid_path != NULL){
+        FILE *f_pid = fopen(pid_path, "w");
+        if(f_pid == NULL){
+            perror("eroare deschidiere fisier pid");
+            exit(1);
+        }
+        fprintf(f_pid, "%d", getpid());
+        fclose(f_pid);
     }
-    fprintf(f_pid, "%d", getpid());
-    fclose(f_pid);
-
     signal(SIGUSR1, handle_sigusr1); //schimbam executia signalelor
     signal(SIGINT, handle_sigterm_sigint);
     signal(SIGTERM, handle_sigterm_sigint);
@@ -236,6 +244,11 @@ int main(int argc, char* argv[]){
 
 
     int workers_pid[workers_number];
+    int control_pipe[2];
+    if(pipe(control_pipe) == -1){
+        perror("eroare pipe");
+        exit(3);
+    }
     for(int i = 0; i < workers_number; i++){ // cream N workeri
         int pid = fork();
         if(pid == -1){
@@ -243,15 +256,18 @@ int main(int argc, char* argv[]){
             exit(5);
         }
         if(pid == 0){ // daca suntem unul din procesele create
+            close(control_pipe[0]);
             char id[11]; // pentru argumentele execl transformat valoarea i in sir de caractere
             char ms[11]; // la fel si pentru timp_simulare
+            char fd[11];
+            snprintf(fd, sizeof(fd), "%d", control_pipe[1]);
             snprintf(id, sizeof(id), "%d", i);
             snprintf(ms, sizeof(ms), "%d", timp_testare);
-            execl("bin/fileops_worker", "fileops_worker", "--worker-id", id, "--ipc", ipc_fisier, "--simulate-work-ms", ms, NULL);
+            execl("bin/fileops_worker", "fileops_worker", "--worker-id", id, "--ipc", ipc_fisier, "--simulate-work-ms", ms, "--control-fd", fd, NULL);
             perror("eroare execl");
             exit(6);
         }
-        else{ // daca suntem manager
+        else{ // daca suntem manager            
             sem_wait(&shm->mutex_stats); // initializam worker_stats
             shm->stats[i].worker_id = i;
             shm->stats[i].pid = pid;
@@ -268,7 +284,27 @@ int main(int argc, char* argv[]){
     file_record *all_records = malloc(records_capacity * sizeof(file_record));
     int records_count = 0;
 
+    close(control_pipe[1]);
+    int flags = fcntl(control_pipe[0], F_GETFL, 0);
+    fcntl(control_pipe[0], F_SETFL, flags | O_NONBLOCK);
+
     while(1){
+        char pipe_buf[4096];
+        int bytes_read = read(control_pipe[0], &pipe_buf, sizeof(pipe_buf) - 1);
+        if(bytes_read > 0){
+            pipe_buf[bytes_read] = '\0';
+            char *line = strtok(pipe_buf, "\n");
+            while(line != NULL){
+                printf("Manager Control Plane: %s\n", line);
+                line = strtok(NULL, "\n");
+            }
+        }
+        else if(bytes_read == -1){
+            if(errno != EAGAIN && errno != EWOULDBLOCK){
+                perror("Manager: eroare citire pipe");
+            }
+        }
+
         if(status_requested){
             status_requested = 0;
             int queued_jobs = (shm->jobs.tail - shm->jobs.head + JOB_QUEUE_SIZE) % JOB_QUEUE_SIZE;
@@ -328,6 +364,7 @@ int main(int argc, char* argv[]){
             usleep(100); // sleep pentru a nu bloca procesorul
         }
     }
+    close(control_pipe[0]);
 
     if(shutdown_requested){
         printf("Manager: shutdown gratios workeri\n");
@@ -403,7 +440,7 @@ int main(int argc, char* argv[]){
     if(status_requested){
         status_requested = 0;
         printf("STATUS queued_jobs=0 active_jobs=0 files=%d bytes=Y workers_alive=Z complete=%d\n", records_count, header.complete);
-        fflush(stdout)
+        fflush(stdout);
 
     }
     header.version = 1;
