@@ -12,7 +12,13 @@
 #include <sys/resource.h>
 #include <limits.h>
 #include <ctype.h>
+#include <signal.h>
 
+volatile sig_atomic_t worker_shutdown_requested;
+
+void handle_sigterm(int sig){
+    worker_shutdown_requested = 1;
+}
 
 void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
     char comanda[4096];
@@ -59,6 +65,9 @@ void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data 
     }
     struct dirent *d;
     while((d = readdir(dir)) != NULL){
+        if(worker_shutdown_requested == 1){
+            break;
+        }
         if(strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0) continue;
         char cale_noua[4096];
         snprintf(cale_noua, 4096, "%s/%s", cale, d->d_name);
@@ -136,6 +145,7 @@ int main(int argc, char* argv[]){
             }
         }
     }
+    signal(SIGTERM, handle_sigterm);
     int fd = open(ipc_fisier, O_RDWR);
     ipc_shared_data *shm = mmap(NULL, sizeof(ipc_shared_data), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if(shm == MAP_FAILED){
@@ -143,8 +153,15 @@ int main(int argc, char* argv[]){
         exit(1);
     }
     close(fd);
-    while(1){
-        sem_wait(&shm->jobs.full);
+    while(!worker_shutdown_requested){
+
+        int ret = sem_wait(&shm->jobs.full);
+        if(ret == -1 && errno == EINTR){
+            if(worker_shutdown_requested){
+                break;
+            }
+            continue;
+        }
         if(shm->is_finished && shm->active_jobs == 0){
             break;
         }

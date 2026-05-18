@@ -11,13 +11,29 @@
 #include <dirent.h>
 #include <signal.h>
 
+volatile sig_atomic_t status_requested;
+volatile sig_atomic_t shutdown_requested;
+volatile sig_atomic_t child_died;
+
+void handle_sigusr1(int sig){
+    status_requested = 1;
+}
+void handle_sigterm_sigint(int sig){
+    shutdown_requested = 1;
+}
+void handle_sigchld(int sig){
+    child_died = 1;
+}
+
 int main(int argc, char* argv[]){
     char *director_root = NULL;
     int workers_number = 0;
     char *ipc_fisier = "data/ipc.mmap";
     char *db_inventar = "data/inventory.db";
+    char *pid_path = "";
     int max_depth = 0;
     int timp_testare = 0; // --simulate-work-ms
+    int timeout_shutdown = 5;
     int verify_flag = 0; // --verify
     int dump_flag = 0; // --dump
 
@@ -50,6 +66,16 @@ int main(int argc, char* argv[]){
         if(strcmp(argv[i], "--simulate-work-ms") == 0){
             if(i + 1 < argc){
                 timp_testare = atoi(argv[i + 1]);
+            }
+        }
+        if(strcmp(argv[i], "--graceful-timeout") == 0){
+            if(i + 1 < argc){
+                timeout_shutdown = atoi(argv[i + 1]);
+            }
+        }
+        if(strcmp(argv[i], "--pid-file") == 0){
+            if(i + 1 < argc){
+                pid_path = argv[i + 1];
             }
         }
         if(strcmp(argv[i], "--verify") == 0){
@@ -138,6 +164,12 @@ int main(int argc, char* argv[]){
     }
     // daca ajungem pana aici inseamna ca suntem in mod inventariere
     //deschidem fisierul ipc si initializam shared memory ul
+    signal(SIGUSR1, handle_sigusr1);
+    signal(SIGINT, handle_sigterm_sigint);
+    signal(SIGTERM, handle_sigterm_sigint);
+    signal(SIGCHLD, handle_sigchld);
+
+
     if(director_root == NULL || opendir(director_root) == NULL){ // verifica existenta directorului root
         fprintf(stderr, "fisier radacina invalid");
         exit(2);
@@ -194,6 +226,8 @@ int main(int argc, char* argv[]){
     sem_post(&shm->mutex_active_jobs);
     sem_post(&shm->jobs.full);
 
+
+    int workers_pid[workers_number];
     for(int i = 0; i < workers_number; i++){ // cream N workeri
         int pid = fork();
         if(pid == -1){
@@ -217,6 +251,8 @@ int main(int argc, char* argv[]){
             shm->stats[i].jobs_processed = 0;
             shm->stats[i].bytes_emitted = 0;
             sem_post(&shm->mutex_stats);
+
+            workers_pid[i] = pid;
         }
     }
 
@@ -225,6 +261,38 @@ int main(int argc, char* argv[]){
     int records_count = 0;
 
     while(1){
+        if(status_requested){
+            status_requested = 0;
+            int queued_jobs = (shm->jobs.tail - shm->jobs.head + JOB_QUEUE_SIZE) % JOB_QUEUE_SIZE;
+            unsigned long long total_bytes = 0;
+            int workers_alive = 0;
+            sem_wait(&shm->mutex_stats);
+            for(int i = 0; i < workers_number; i++){
+                total_bytes += shm->stats[i].bytes_emitted;
+            }
+            sem_post(&shm->mutex_stats);
+            for(int i = 0; i < workers_number; i++){
+                if(workers_pid[i] > 0){
+                    workers_alive++;
+                }
+            }
+            printf("STATUS queued_jobs=%d active_jobs=%d files=%d bytes=%llu workers_alive=%d complete=0\n", queued_jobs, shm->active_jobs, records_count, total_bytes, workers_alive);
+            fflush(stdout);
+        }
+        if(shutdown_requested){
+            printf("Manager: Primit semnal de oprire.\n");
+            shm->is_finished = 1;
+            break;
+        }
+        if(child_died){
+            child_died = 0;
+            int status, pid;
+            while((pid = waitpid(-1, &status, WNOHANG)) > 0){
+                printf("Manager: Workerul cu PID %d a murit\n", pid);
+
+            }
+        }
+
         if(sem_trywait(&shm->results.full) == 0){ // daca putem scadea semaforul results.full continuam, inseamna ca avem un file_record de procesat
             // nu am pus doar wait mai sus pentru a putea termina programul 
             sem_wait(&shm->results.mutex);
@@ -253,31 +321,83 @@ int main(int argc, char* argv[]){
         }
     }
 
-    for(int i = 0; i < workers_number; i++){ // asteptam terminarea workerilor si capturam exit codeurile lor
-        int status;
-        int pid = waitpid(-1, &status, 0); // pid retine pid-ul unui proces fiu, status - statusul terminariii
-        int exit_code = -1;
-        if(WIFEXITED(status)){ // daca s-a terminat fara probleme
-            exit_code = WEXITSTATUS(status); // aflam ultimii 8 biti
+    if(shutdown_requested){
+        printf("Manager: shutdown gratios workeri\n");
+        for(int i = 0; i < workers_number; i++){
+            kill(workers_pid[i], SIGTERM);
         }
-        else if(WIFSIGNALED(status)){ 
-            exit_code = 128 + WTERMSIG(status); // pentru a diferentia iesirile normale fata de cele intrerupte de sistem, adaugam 128
-        }
-        for(int j = 0; j < workers_number; j++){
-            sem_wait(&shm->mutex_stats);
-            if(shm->stats[j].pid == (unsigned int)pid){ // cautam workerul cu pid-ul selectat mai sus
-                shm->stats[j].exit_status = exit_code;
-                sem_post(&shm->mutex_stats);
-                break;
+        int timp_scurs = 0;
+        int active_workers = workers_number;
+        while(timp_scurs < timeout_shutdown && active_workers){
+            active_workers = 0;
+            for(int i = 0; i < workers_number; i++){
+                if(workers_pid[i] > 0){
+                    int status;
+                    int res = waitpid(workers_pid[i], &status, WNOHANG);
+                    if(res == 0){
+                        active_workers++;
+                    }
+                    else if (res == workers_pid[i]){
+                        shm->stats[i].exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : (128 + WTERMSIG(status));
+                        workers_pid[i] = 0;
+                   }
+                }
             }
-            sem_post(&shm->mutex_stats);
+            if(active_workers > 0){
+                sleep(1);
+                timp_scurs++;
+            }
+        }
+        if(active_workers > 0){
+            printf("Manager: Timp gratios depasit, SIGKILL restul proceselor\n");
+            for(int i = 0; i < workers_number; i++){
+                if(workers_pid[i] > 0){
+                    kill(workers_pid[i], SIGKILL);
+                    int status;
+                    waitpid(workers_pid[i], &status, 0);
+                    shm->stats[i].exit_status = 128 + WTERMSIG(status);
+                }
+            }
+        }
+    }
+    else{
+        for(int i = 0; i < workers_number; i++){ // asteptam terminarea workerilor si capturam exit codeurile lor
+            int status;
+            int pid = waitpid(-1, &status, 0); // pid retine pid-ul unui proces fiu, status - statusul terminariii
+            int exit_code = -1;
+            if(WIFEXITED(status)){ // daca s-a terminat fara probleme
+                exit_code = WEXITSTATUS(status); // aflam ultimii 8 biti
+            }
+            else if(WIFSIGNALED(status)){ 
+                exit_code = 128 + WTERMSIG(status); // pentru a diferentia iesirile normale fata de cele intrerupte de sistem, adaugam 128
+            }
+            for(int j = 0; j < workers_number; j++){
+                sem_wait(&shm->mutex_stats);
+                if(shm->stats[j].pid == (unsigned int)pid){ // cautam workerul cu pid-ul selectat mai sus
+                    shm->stats[j].exit_status = exit_code;
+                    sem_post(&shm->mutex_stats);
+                    break;
+                }
+                sem_post(&shm->mutex_stats);
+            }
         }
     }
     //pregatim baza de date finala
     //scriem in header
     db_header header;
     strcpy(header.magic, "INV4");
-    header.complete = 1;
+    if(shm->active_jobs == 0 && shutdown_requested == 0){
+        header.complete = 1;
+    }
+    else{
+        header.complete = 0;
+    }
+    if(status_requested){
+        status_requested = 0;
+        printf("STATUS queued_jobs=0 active_jobs=0 files=%d bytes=Y workers_alive=Z complete=%d\n", records_count, header.complete);
+        fflush(stdout)
+
+    }
     header.version = 1;
     header.worker_count = workers_number;
     header.file_record_count = records_count;
