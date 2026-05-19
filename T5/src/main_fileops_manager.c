@@ -77,8 +77,10 @@ void verify(const char* db_inventar){
         }
        
         if(header.complete != 1){
-            fprintf(stderr, "inventar oprit inainte de a fi terminat");
-            exit(15);
+            printf("DB Complet\n");
+        }
+        else{
+            printf("DB incomplet, dar valid structural\n");
         }
         printf("Verificare reusita si contine %u inregistrari", header.file_record_count); // totul in regula
         close(fd_verify);
@@ -429,6 +431,23 @@ int main(int argc, char* argv[]){
     }
     //pregatim baza de date finala
     //scriem in header
+
+    while (sem_trywait(&shm->results.full) == 0) {
+        sem_wait(&shm->results.mutex);
+
+        file_record *fisier_citit = &shm->results.buffer[shm->results.head];
+        if(records_count >= records_capacity){ 
+            records_capacity *= 2;
+            all_records = realloc(all_records, records_capacity * sizeof(file_record));
+        }
+        memcpy(&all_records[records_count++], fisier_citit, sizeof(file_record));
+
+        shm->results.head = (shm->results.head + 1) % RESULTS_CAPACITY;
+
+        sem_post(&shm->results.mutex);
+        sem_post(&shm->results.empty);
+    }
+
     db_header header;
     strcpy(header.magic, "INV4");
     if(shm->active_jobs == 0 && shutdown_requested == 0){
