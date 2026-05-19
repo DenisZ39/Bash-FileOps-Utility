@@ -60,7 +60,7 @@ void calculeaza_hash_fisier(const char *cale, unsigned char *hash_rezultat) {
 void parcurge_director(char *cale, int depth, int id, int timp, ipc_shared_data *shm, int control_fd){
     DIR *dir = opendir(cale);
     if(dir == NULL){
-        char msg_err[256];
+        char msg_err[256]; // eroare deschidere director
         snprintf(msg_err, sizeof(msg_err), "T5MSG type=ERROR worker_id=%d errno=%d where=opendir\n", id, errno);
         
         if (control_fd >= 0) {

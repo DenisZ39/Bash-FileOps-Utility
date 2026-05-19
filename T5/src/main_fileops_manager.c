@@ -74,9 +74,9 @@ void verify(const char* db_inventar){
         if(header.version != 1){
             fprintf(stderr, "versiune inventar gresita");
             exit(13);
-        }
+        }   
        
-        if(header.complete != 1){
+        if(header.complete == 1){
             printf("DB Complet\n");
         }
         else{
@@ -173,7 +173,8 @@ int main(int argc, char* argv[]){
     }
     // daca ajungem pana aici inseamna ca suntem in mod inventariere
     //deschidem fisierul ipc si initializam shared memory ul
-    if(pid_path != NULL){
+    
+    if(pid_path != NULL){ // deschidem fisierul pt pid si il scriem
         FILE *f_pid = fopen(pid_path, "w");
         if(f_pid == NULL){
             perror("eroare deschidiere fisier pid");
@@ -182,6 +183,7 @@ int main(int argc, char* argv[]){
         fprintf(f_pid, "%d", getpid());
         fclose(f_pid);
     }
+
     signal(SIGUSR1, handle_sigusr1); //schimbam executia signalelor
     signal(SIGINT, handle_sigterm_sigint);
     signal(SIGTERM, handle_sigterm_sigint);
@@ -245,8 +247,8 @@ int main(int argc, char* argv[]){
     sem_post(&shm->jobs.full);
 
 
-    int workers_pid[workers_number];
-    int control_pipe[2];
+    int workers_pid[workers_number]; 
+    int control_pipe[2]; // pipe pentru comunicare intre manager si workeri
     if(pipe(control_pipe) == -1){
         perror("eroare pipe");
         exit(3);
@@ -258,7 +260,7 @@ int main(int argc, char* argv[]){
             exit(5);
         }
         if(pid == 0){ // daca suntem unul din procesele create
-            close(control_pipe[0]);
+            close(control_pipe[0]); // inchidem canalul pentru citire
             char id[11]; // pentru argumentele execl transformat valoarea i in sir de caractere
             char ms[11]; // la fel si pentru timp_simulare
             char fd[11];
@@ -286,28 +288,28 @@ int main(int argc, char* argv[]){
     file_record *all_records = malloc(records_capacity * sizeof(file_record));
     int records_count = 0;
 
-    close(control_pipe[1]);
-    int flags = fcntl(control_pipe[0], F_GETFL, 0);
+    close(control_pipe[1]); // in manager inchidem canalul pentru scriere
+    int flags = fcntl(control_pipe[0], F_GETFL, 0); // trecem canalul pentru citire in mod nonblocant
     fcntl(control_pipe[0], F_SETFL, flags | O_NONBLOCK);
 
     while(1){
         char pipe_buf[4096];
-        int bytes_read = read(control_pipe[0], &pipe_buf, sizeof(pipe_buf) - 1);
-        if(bytes_read > 0){
-            pipe_buf[bytes_read] = '\0';
-            char *line = strtok(pipe_buf, "\n");
+        int bytes_read = read(control_pipe[0], &pipe_buf, sizeof(pipe_buf) - 1); // daca avem mesaj il procesam
+        if(bytes_read > 0){ // find in mod nonblocant, read nu blocheaza pana avem pe pipe
+            pipe_buf[bytes_read] = '\0'; 
+            char *line = strtok(pipe_buf, "\n"); // citim fiecare mesaj
             while(line != NULL){
                 printf("Manager Control Plane: %s\n", line);
                 line = strtok(NULL, "\n");
             }
         }
-        else if(bytes_read == -1){
+        else if(bytes_read == -1){ // in caz de alta eroare
             if(errno != EAGAIN && errno != EWOULDBLOCK){
                 perror("Manager: eroare citire pipe");
             }
         }
 
-        if(status_requested){
+        if(status_requested){ // scriem statusul curent
             status_requested = 0;
             int queued_jobs = (shm->jobs.tail - shm->jobs.head + JOB_QUEUE_SIZE) % JOB_QUEUE_SIZE;
             unsigned long long total_bytes = 0;
@@ -327,12 +329,12 @@ int main(int argc, char* argv[]){
         }
         if(shutdown_requested){
             printf("Manager: Primit semnal de oprire.\n");
-            shm->is_finished = 1;
+            shm->is_finished = 1; // setam flag finished si iesim din bucla
             break;
         }
-        if(child_died){
+        if(child_died){ 
             child_died = 0;
-            int status, pid;
+            int status, pid; // curatam procesele zombie
             while((pid = waitpid(-1, &status, WNOHANG)) > 0){
                 printf("Manager: Workerul cu PID %d a murit\n", pid);
 
@@ -366,14 +368,14 @@ int main(int argc, char* argv[]){
             usleep(100); // sleep pentru a nu bloca procesorul
         }
     }
-    close(control_pipe[0]);
+    close(control_pipe[0]); // inchidem pipe comunicare 
 
     if(shutdown_requested){
         printf("Manager: shutdown gratios workeri\n");
         for(int i = 0; i < workers_number; i++){
-            kill(workers_pid[i], SIGTERM);
+            kill(workers_pid[i], SIGTERM); // trimitem semnal la fiecare worker
         }
-        int timp_scurs = 0;
+        int timp_scurs = 0; // contorizam cat timp dureaza inchiderea lor
         int active_workers = workers_number;
         while(timp_scurs < timeout_shutdown && active_workers){
             active_workers = 0;
@@ -381,33 +383,33 @@ int main(int argc, char* argv[]){
                 if(workers_pid[i] > 0){
                     int status;
                     int res = waitpid(workers_pid[i], &status, WNOHANG);
-                    if(res == 0){
+                    if(res == 0){ // daca sunt inca in viata
                         active_workers++;
                     }
-                    else if (res == workers_pid[i]){
+                    else if (res == workers_pid[i]){ // daca a murit
                         shm->stats[i].exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : (128 + WTERMSIG(status));
                         workers_pid[i] = 0;
                    }
                 }
             }
             if(active_workers > 0){
-                sleep(1);
+                sleep(1); // mai asteptam
                 timp_scurs++;
             }
         }
-        if(active_workers > 0){
+        if(active_workers > 0){ // shutdown fortat
             printf("Manager: Timp gratios depasit, SIGKILL restul proceselor\n");
             for(int i = 0; i < workers_number; i++){
                 if(workers_pid[i] > 0){
-                    kill(workers_pid[i], SIGKILL);
+                    kill(workers_pid[i], SIGKILL); 
                     int status;
                     waitpid(workers_pid[i], &status, 0);
-                    shm->stats[i].exit_status = 128 + WTERMSIG(status);
+                    shm->stats[i].exit_status = 128 + WTERMSIG(status); // cod terminare fortata
                 }
             }
         }
     }
-    else{
+    else{ // daca nu primim sigterm
         for(int i = 0; i < workers_number; i++){ // asteptam terminarea workerilor si capturam exit codeurile lor
             int status;
             int pid = waitpid(-1, &status, 0); // pid retine pid-ul unui proces fiu, status - statusul terminariii
@@ -432,7 +434,7 @@ int main(int argc, char* argv[]){
     //pregatim baza de date finala
     //scriem in header
 
-    while (sem_trywait(&shm->results.full) == 0) {
+    while (sem_trywait(&shm->results.full) == 0) { // in caz ca am primit sigterm, curatam coada de rezultate
         sem_wait(&shm->results.mutex);
 
         file_record *fisier_citit = &shm->results.buffer[shm->results.head];
@@ -456,7 +458,7 @@ int main(int argc, char* argv[]){
     else{
         header.complete = 0;
     }
-    if(status_requested){
+    if(status_requested){ // poate se cere un untim status
         status_requested = 0;
         printf("STATUS queued_jobs=0 active_jobs=0 files=%d bytes=Y workers_alive=Z complete=%d\n", records_count, header.complete);
         fflush(stdout);
