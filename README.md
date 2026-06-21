@@ -18,4 +18,4 @@ Built to deepen hands-on knowledge of shell scripting, automation, permissions m
 ## ⚙️ How to Run
 1. Clone this repository:
    ```bash
-   git clone [https://github.com/DenisZ39/Bash-Fileops-Utility.git](https://github.com/DenisZ39/Bash-Fileops-Utility.git)
+         git clone [https://github.com/DenisZ39/Bash-FileOps-Utility.git](https://github.com/DenisZ39/Bash-FileOps-Utility.git)
